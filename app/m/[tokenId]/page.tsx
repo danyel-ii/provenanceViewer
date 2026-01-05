@@ -2,10 +2,8 @@ import Link from "next/link";
 
 import CubeProvenanceExplorer from "../../_components/CubeProvenanceExplorer";
 import MintAuditPanel from "../../_components/MintAuditPanel";
-import {
-  CUBIXLES_MINTED_CUBES,
-  getMintedCube,
-} from "../../_data/minted-cube";
+import { getLiveMintedCube } from "../../_lib/mintedCubeService";
+import { CUBIXLES_MINTED_CUBES } from "../../_data/minted-cube";
 import { MINT_AUDIT } from "../../_data/mint-audit";
 
 const fallbackCube = CUBIXLES_MINTED_CUBES[MINT_AUDIT.tokenId];
@@ -15,7 +13,7 @@ export async function generateMetadata({
 }: {
   params: { tokenId: string };
 }) {
-  const cube = getMintedCube(params.tokenId) ?? fallbackCube;
+  const cube = (await getLiveMintedCube(params.tokenId)) ?? fallbackCube;
 
   const canonicalUrl = cube.tokenViewUrl
     ? cube.tokenViewUrl
@@ -46,8 +44,12 @@ export async function generateMetadata({
   };
 }
 
-export default function TokenPlaceholder({ params }: { params: { tokenId: string } }) {
-  const cube = getMintedCube(params.tokenId) ?? fallbackCube;
+export default async function TokenPlaceholder({
+  params,
+}: {
+  params: { tokenId: string };
+}) {
+  const cube = (await getLiveMintedCube(params.tokenId)) ?? fallbackCube;
 
   return (
     <main className="landing-page">

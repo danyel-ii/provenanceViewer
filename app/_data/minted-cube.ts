@@ -22,6 +22,11 @@ export type MintedCube = {
   provenanceNote: string;
   references: { label: string; url: string }[];
   provenanceNFTs: CubeProvenanceNFT[];
+  provenanceTrail: {
+    title: string;
+    detail: string;
+    reference?: { label: string; url: string };
+  }[];
 };
 
 export const CUBIXLES_MINTED_CUBES: Record<string, MintedCube> = {
@@ -118,6 +123,40 @@ export const CUBIXLES_MINTED_CUBES: Record<string, MintedCube> = {
         metadataUrl: "https://ipfs.io/ipfs/QmEchoMask4410",
       },
     ],
+    provenanceTrail: [
+      {
+        title: "Selection & citation",
+        detail:
+          "1–6 NFTs from the wallet become references, each assigned to a cube face according to the lumens and citations they provide.",
+        reference: {
+          label: "Mint spec",
+          url: "https://github.com/danyel-ii/cubixles_-miniapp/blob/main/MASTER.md",
+        },
+      },
+      {
+        title: "Snapshot lineage",
+        detail:
+          "Metadata and floor data snapshot actions log both the creative lineage and the signed activity that formed the cube’s composition.",
+        reference: {
+          label: "Metadata snapshot",
+          url: "https://ipfs.io/ipfs/QmPrismCubeSnapshot68856407996780796028956744786520837137006152108154744843335376429330318427953",
+        },
+      },
+      {
+        title: "Composition & publishing",
+        detail:
+          "The cube viewer reels the six faces back into a single proof-of-work, then pins the experience to IPFS before minting.",
+        reference: {
+          label: "Gallery link",
+          url: "https://www.cubixles.xyz/m/68856407996780796028956744786520837137006152108154744843335376429330318427953",
+        },
+      },
+      {
+        title: "On-chain sealing",
+        detail:
+          "An ERC-721 mint includes the cube snapshot, references, and a 5% resale royalty with ERC-2981 so secondary trades continue to document provenance.",
+      },
+    ],
   },
 };
 
@@ -131,4 +170,8 @@ export function getMintedCube(tokenId?: string) {
   }
   const canonicalId = CUBIXLES_MINTED_TOKEN_ALIASES[tokenId] ?? tokenId;
   return CUBIXLES_MINTED_CUBES[canonicalId] ?? null;
+}
+
+export function getAllMintedCubes() {
+  return Object.values(CUBIXLES_MINTED_CUBES);
 }
