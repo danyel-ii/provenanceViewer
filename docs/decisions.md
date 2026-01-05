@@ -17,3 +17,7 @@
 
 ## Provenance scope
 - Owner overlap checks are computed only for candidates found via metadata or same-transaction minting to avoid indexer-like scans.
+
+## Env fallbacks
+- Support `ALCHEMY_API_KEY` and `CUBIXLES_CONTRACT_ADDRESS` as fallbacks for local `.env` files.
+- If `NETWORK` is missing, map `CUBIXLES_CHAIN_ID`/`BASE_CHAIN_ID` to Alchemy network IDs; otherwise require `NETWORK`.

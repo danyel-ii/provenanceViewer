@@ -1,5 +1,3 @@
-const REQUIRED_ENV = ["ALCHEMY_KEY", "CUBIXLES_CONTRACT", "NETWORK"] as const;
-
 type CacheTtls = {
   tokens: number;
   metadata: number;
@@ -19,12 +17,50 @@ export type EnvConfig = {
 
 let cachedConfig: EnvConfig | null = null;
 
-function requireEnv(name: (typeof REQUIRED_ENV)[number]): string {
+const NETWORK_BY_CHAIN_ID: Record<number, string> = {
+  1: "eth-mainnet",
+  5: "eth-goerli",
+  11155111: "eth-sepolia",
+  137: "polygon-mainnet",
+  80001: "polygon-mumbai",
+  8453: "base-mainnet",
+  84532: "base-sepolia",
+};
+
+function readEnv(name: string): string | undefined {
   const value = process.env[name];
   if (!value) {
-    throw new Error(`Missing required env var: ${name}`);
+    return undefined;
   }
-  return value;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+}
+
+function requireEnv(names: string[], label: string): string {
+  for (const name of names) {
+    const value = readEnv(name);
+    if (value) {
+      return value;
+    }
+  }
+  throw new Error(`Missing required env var: ${label}`);
+}
+
+function resolveNetwork(): string {
+  const direct = readEnv("NETWORK");
+  if (direct) {
+    return direct;
+  }
+
+  const chainIdRaw = readEnv("CUBIXLES_CHAIN_ID") ?? readEnv("BASE_CHAIN_ID");
+  if (chainIdRaw) {
+    const chainId = Number.parseInt(chainIdRaw, 10);
+    if (Number.isFinite(chainId) && NETWORK_BY_CHAIN_ID[chainId]) {
+      return NETWORK_BY_CHAIN_ID[chainId];
+    }
+  }
+
+  throw new Error("Missing required env var: NETWORK");
 }
 
 function parseNumberEnv(name: string, fallback: number): number {
@@ -41,9 +77,12 @@ export function getEnvConfig(): EnvConfig {
     return cachedConfig;
   }
 
-  const alchemyKey = requireEnv("ALCHEMY_KEY");
-  const network = requireEnv("NETWORK");
-  const contractAddress = requireEnv("CUBIXLES_CONTRACT");
+  const alchemyKey = requireEnv(["ALCHEMY_KEY", "ALCHEMY_API_KEY"], "ALCHEMY_KEY");
+  const network = resolveNetwork();
+  const contractAddress = requireEnv(
+    ["CUBIXLES_CONTRACT", "CUBIXLES_CONTRACT_ADDRESS"],
+    "CUBIXLES_CONTRACT"
+  );
 
   cachedConfig = {
     alchemyKey,
