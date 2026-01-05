@@ -1,0 +1,48 @@
+# cubixles_ Provenance Viewer (Read-only)
+
+A read-only, off-chain provenance viewer for NFTs minted on the CUBIXLES_CONTRACT. The app inspects metadata, mint transactions, and ownership overlap to infer relationships without ever signing or writing on-chain.
+
+## Requirements
+- Node.js 18+
+- Alchemy API key
+- CUBIXLES_CONTRACT + NETWORK env vars
+
+## Setup
+```bash
+npm install
+npm run dev
+```
+
+If you hit npm cache permission issues, use `npm install --cache .npm-cache`.
+
+Copy `.env.example` to `.env.local` and fill in values:
+- `ALCHEMY_KEY`
+- `CUBIXLES_CONTRACT`
+- `NETWORK`
+
+Optional caching and rate limits:
+- `CACHE_PROVIDER` (`memory`, `redis`, `kv`)
+- `REDIS_URL`
+- `CACHE_TTL_*`
+- `VERIFY_RATE_LIMIT`, `VERIFY_RATE_WINDOW_SECONDS`
+- `KV_REST_API_URL`, `KV_REST_API_TOKEN`, `KV_REST_API_READ_ONLY_TOKEN`
+
+## API endpoints
+- `GET /api/poc/tokens?limit=`
+  - Proof-of-concept list of tokens from CUBIXLES_CONTRACT.
+- `GET /api/token/:id`
+  - Token metadata + mint info (read-only).
+- `GET /api/token/:id/provenance`
+  - Heuristic provenance candidates with confidence + evidence.
+- `POST /api/token/:id/verify`
+  - Read-only verification (ownerOf + tokenURI). Rate limited.
+
+## Frontend
+- `GET /token/[id]`
+  - Token viewer that renders metadata, provenance candidates, and verification UI.
+
+## Limits and assumptions
+- Provenance is heuristic and can be incomplete.
+- Only tokens from `CUBIXLES_CONTRACT` are valid.
+- No wallet connections, signing, or on-chain writes are permitted.
+- Metadata is resolved through IPFS/Arweave gateways and cached with TTLs.

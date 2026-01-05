@@ -17,6 +17,8 @@ const NETWORK_LABELS: Record<string, string> = {
   "8453": "Base Mainnet",
 };
 
+const FACE_IDS = ["+X", "-X", "+Y", "-Y", "+Z", "-Z"] as const;
+
 const FALLBACK_STATIC_CUBE =
   CUBIXLES_MINTED_CUBES[MINT_AUDIT.tokenId] ??
   Object.values(CUBIXLES_MINTED_CUBES)[0] ??
@@ -86,6 +88,10 @@ function pickString(...values: (string | undefined | null)[]): string | undefine
   return undefined;
 }
 
+function isFaceId(value?: string): value is (typeof FACE_IDS)[number] {
+  return value ? FACE_IDS.includes(value as (typeof FACE_IDS)[number]) : false;
+}
+
 function buildProvenanceNFT(
   source: Record<string, unknown>,
   fallback?: MintedCube["provenanceNFTs"][number]
@@ -100,14 +106,15 @@ function buildProvenanceNFT(
     fallback?.metadataUrl
   );
 
+  const faceIdCandidate = pickString(
+    source.faceId as string | undefined,
+    source.id as string | undefined,
+    source.label as string | undefined,
+    fallback?.faceId
+  );
+
   return {
-    faceId:
-      pickString(
-        source.faceId as string | undefined,
-        source.id as string | undefined,
-        source.label as string | undefined,
-        fallback?.faceId
-      ) ?? `unknown-face`,
+    faceId: isFaceId(faceIdCandidate) ? faceIdCandidate : fallback?.faceId ?? "+X",
     title:
       pickString(
         source.title as string | undefined,
@@ -266,10 +273,8 @@ function parseProvenanceTrail(
         reference,
       };
     })
-    .filter(
-      (entry): entry is MintedCube["provenanceTrail"][number] =>
-        Boolean(entry && entry.title && entry.detail)
-    );
+    .filter((entry) => Boolean(entry && entry.title && entry.detail)) as
+    MintedCube["provenanceTrail"];
 
   return parsed.length ? parsed : fallback;
 }
@@ -471,10 +476,10 @@ async function buildLiveCube(tokenId: string): Promise<MintedCube | null> {
   return mergeMintedCube(normalizedId, fallbackCube, transfer, metadata);
 }
 
-export function getLiveMintedCube(tokenId?: string): Promise<MintedCube | null> {
+export async function getLiveMintedCube(tokenId?: string): Promise<MintedCube | null> {
   const normalizedId = normalizeTokenId(tokenId ?? undefined);
   if (!normalizedId) {
-    return Promise.resolve(null);
+    return null;
   }
 
   if (!liveCubeCache[normalizedId]) {
