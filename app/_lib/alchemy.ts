@@ -37,7 +37,7 @@ type AlchemyNft = {
 
 type AlchemyCollectionResponse = {
   nfts?: AlchemyNft[];
-  nextToken?: string;
+  pageKey?: string;
 };
 
 type AlchemyMetadataResponse = AlchemyNft & {
@@ -75,6 +75,20 @@ export type NormalizedTokenMetadata = {
   } | null;
   media: AlchemyNftMedia[];
   mint: AlchemyMintInfo | null;
+};
+
+export type NormalizedCollectionPage = {
+  contractAddress: string;
+  tokens: NormalizedNft[];
+  pageKey?: string;
+};
+
+export type NormalizedCollectionAggregate = {
+  contractAddress: string;
+  tokens: NormalizedNft[];
+  pageKey: string | null;
+  pages: number;
+  truncated: boolean;
 };
 
 const RETRYABLE_STATUSES = new Set([408, 429, 500, 502, 503, 504]);
@@ -137,7 +151,10 @@ async function alchemyFetch<T>(
   return (await response.json()) as T;
 }
 
-export async function getNftsForCollection(limit: number) {
+export async function getNftsForCollection(
+  limit: number,
+  pageKey?: string | null
+): Promise<NormalizedCollectionPage> {
   const { contractAddress, cacheTtls } = getEnvConfig();
   const normalizedContract = normalizeAddress(contractAddress);
   if (!normalizedContract) {
@@ -145,7 +162,9 @@ export async function getNftsForCollection(limit: number) {
   }
 
   const clampedLimit = Math.min(Math.max(limit, 1), 100);
-  const cacheKey = `alchemy:collection:${normalizedContract}:${clampedLimit}`;
+  const cacheKey = `alchemy:collection:${normalizedContract}:${clampedLimit}:${
+    pageKey ? encodeURIComponent(pageKey) : "first"
+  }`;
 
   return getCachedJson(cacheKey, cacheTtls.tokens, async () => {
     const response = await alchemyFetch<AlchemyCollectionResponse>(
@@ -154,6 +173,7 @@ export async function getNftsForCollection(limit: number) {
         contractAddress: normalizedContract,
         withMetadata: true,
         limit: clampedLimit,
+        pageKey: pageKey ?? undefined,
       }
     );
 
@@ -187,7 +207,68 @@ export async function getNftsForCollection(limit: number) {
     return {
       contractAddress: normalizedContract,
       tokens,
-      nextToken: response.nextToken,
+      pageKey: response.pageKey,
+    };
+  });
+}
+
+export async function getAllNftsForCollection(options?: {
+  pageSize?: number;
+  maxPages?: number;
+  startPageKey?: string | null;
+}): Promise<NormalizedCollectionAggregate> {
+  const { contractAddress, cacheTtls } = getEnvConfig();
+  const normalizedContract = normalizeAddress(contractAddress);
+  if (!normalizedContract) {
+    throw new Error("Invalid CUBIXLES_CONTRACT value");
+  }
+
+  const pageSize = Math.min(Math.max(options?.pageSize ?? 100, 1), 100);
+  const maxPages = Math.min(Math.max(options?.maxPages ?? 10, 1), 50);
+  const startKey = options?.startPageKey ?? null;
+  const cacheKey = `alchemy:collection:all:${normalizedContract}:${pageSize}:${maxPages}:${
+    startKey ? encodeURIComponent(startKey) : "start"
+  }`;
+
+  return getCachedJson(cacheKey, cacheTtls.tokens, async () => {
+    const tokensById = new Map<string, NormalizedNft>();
+    const seenPageKeys = new Set<string>();
+    let pageKey = startKey ?? undefined;
+    let pages = 0;
+    let truncated = false;
+
+    while (pages < maxPages) {
+      if (pageKey) {
+        if (seenPageKeys.has(pageKey)) {
+          truncated = true;
+          break;
+        }
+        seenPageKeys.add(pageKey);
+      }
+
+      const page = await getNftsForCollection(pageSize, pageKey);
+      page.tokens.forEach((token) => {
+        tokensById.set(token.tokenId, token);
+      });
+
+      pages += 1;
+      if (!page.pageKey || page.tokens.length === 0) {
+        pageKey = null;
+        break;
+      }
+      pageKey = page.pageKey;
+    }
+
+    if (pageKey) {
+      truncated = true;
+    }
+
+    return {
+      contractAddress: normalizedContract,
+      tokens: Array.from(tokensById.values()),
+      pageKey: pageKey ?? null,
+      pages,
+      truncated,
     };
   });
 }

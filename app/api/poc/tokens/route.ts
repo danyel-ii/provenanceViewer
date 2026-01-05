@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 
 import { getEnvConfig } from "../../../_lib/env";
-import { getNftsForCollection } from "../../../_lib/alchemy";
+import {
+  getAllNftsForCollection,
+  getNftsForCollection,
+} from "../../../_lib/alchemy";
 
 export const dynamic = "force-dynamic";
 
@@ -9,16 +12,32 @@ export async function GET(request: Request) {
   const { network, contractAddress } = getEnvConfig();
   const { searchParams } = new URL(request.url);
   const limitParam = searchParams.get("limit");
+  const pageKeyParam = searchParams.get("pageKey");
+  const allParam = searchParams.get("all");
+  const maxPagesParam = searchParams.get("maxPages");
   const parsedLimit = limitParam ? Number.parseInt(limitParam, 10) : 20;
   const limit = Number.isFinite(parsedLimit) ? parsedLimit : 20;
+  const all = allParam === "1" || allParam === "true";
+  const parsedMaxPages = maxPagesParam
+    ? Number.parseInt(maxPagesParam, 10)
+    : 10;
+  const maxPages = Number.isFinite(parsedMaxPages) ? parsedMaxPages : 10;
 
-  const result = await getNftsForCollection(limit);
+  const pageKey =
+    pageKeyParam && pageKeyParam.trim().length > 0 ? pageKeyParam : undefined;
+  const result = all
+    ? await getAllNftsForCollection({ pageSize: limit, maxPages })
+    : await getNftsForCollection(limit, pageKey);
 
   return NextResponse.json({
     network,
     contractAddress,
     count: result.tokens.length,
     tokens: result.tokens,
-    nextToken: result.nextToken ?? null,
+    pageKey: result.pageKey ?? null,
+    nextToken: result.pageKey ?? null,
+    pages: "pages" in result ? result.pages : 1,
+    truncated: "truncated" in result ? result.truncated : false,
+    mode: all ? "all" : "page",
   });
 }

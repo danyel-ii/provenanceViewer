@@ -5,7 +5,7 @@ A read-only, off-chain provenance viewer for NFTs minted on the CUBIXLES_CONTRAC
 ## Requirements
 - Node.js 18+
 - Alchemy API key
-- CUBIXLES_CONTRACT + NETWORK env vars
+- CUBIXLES contract + network env vars
 
 ## Setup
 ```bash
@@ -16,9 +16,10 @@ npm run dev
 If you hit npm cache permission issues, use `npm install --cache .npm-cache`.
 
 Copy `.env.example` to `.env.local` and fill in values:
-- `ALCHEMY_KEY`
-- `CUBIXLES_CONTRACT`
-- `NETWORK`
+- `ALCHEMY_KEY` (or `ALCHEMY_API_KEY`)
+- `CUBIXLES_CONTRACT` (or `CUBIXLES_CONTRACT_ADDRESS`)
+- `NETWORK` (or `CUBIXLES_CHAIN_ID`/`BASE_CHAIN_ID` for auto-mapping)
+- Optional placeholder: `CUBIXLES_BASE_CONTRACT_ADDRESS` (not used yet)
 
 Optional caching and rate limits:
 - `CACHE_PROVIDER` (`memory`, `redis`, `kv`)
@@ -28,8 +29,9 @@ Optional caching and rate limits:
 - `KV_REST_API_URL`, `KV_REST_API_TOKEN`, `KV_REST_API_READ_ONLY_TOKEN`
 
 ## API endpoints
-- `GET /api/poc/tokens?limit=`
+- `GET /api/poc/tokens?limit=&pageKey=&all=true&maxPages=`
   - Proof-of-concept list of tokens from CUBIXLES_CONTRACT.
+  - Use `pageKey` for pagination; `all=true` aggregates pages (capped by `maxPages`).
 - `GET /api/token/:id`
   - Token metadata + mint info (read-only).
 - `GET /api/token/:id/provenance`

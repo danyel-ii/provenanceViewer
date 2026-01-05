@@ -65,10 +65,14 @@ export async function GET(
           if (candidateId === tokenId) {
             return;
           }
-          const candidateOwners = await getOwnersForToken(candidateId);
-          const overlap = buildOwnerOverlapEvidence(targetOwners, candidateOwners);
-          if (overlap) {
-            ownerOverlap.set(candidateId, overlap);
+          try {
+            const candidateOwners = await getOwnersForToken(candidateId);
+            const overlap = buildOwnerOverlapEvidence(targetOwners, candidateOwners);
+            if (overlap) {
+              ownerOverlap.set(candidateId, overlap);
+            }
+          } catch {
+            // Ignore invalid candidate ids or transient owner lookup failures.
           }
         })
       );

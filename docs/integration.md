@@ -8,6 +8,7 @@ This app uses the Alchemy NFT REST API for collection and metadata lookups, and 
 
 ## NFT REST endpoints used
 - `GET /getNFTsForCollection?contractAddress=...&withMetadata=true&limit=...`
+  - Accepts `pageKey` for pagination; responses include `pageKey` when more results remain.
   - Fetches collection tokens for `/api/poc/tokens`.
 - `GET /getNFTMetadata?contractAddress=...&tokenId=...`
   - Fetches token metadata and mint details for `/api/token/:id`.

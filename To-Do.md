@@ -57,3 +57,11 @@ Acceptance:
 
 ## Phase F — Frontend
 - [x] Token page `/token/[id]`
+
+---
+
+## Phase G — Collection coverage & validation
+- [x] Add pagination support for `/api/poc/tokens` (`pageKey`)
+- [x] Add `all=true` aggregation with a max-page safety cap
+- [x] Document pagination + BASE placeholder env vars
+- [x] Validate `/api/token/:id`, `/api/token/:id/provenance`, `/api/token/:id/verify`

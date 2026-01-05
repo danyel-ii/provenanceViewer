@@ -21,3 +21,10 @@
 ## Env fallbacks
 - Support `ALCHEMY_API_KEY` and `CUBIXLES_CONTRACT_ADDRESS` as fallbacks for local `.env` files.
 - If `NETWORK` is missing, map `CUBIXLES_CHAIN_ID`/`BASE_CHAIN_ID` to Alchemy network IDs; otherwise require `NETWORK`.
+
+## Collection pagination
+- Use Alchemy `pageKey` for `getNFTsForCollection`; expose `pageKey` to clients.
+- `all=true` aggregates pages with a safety cap to avoid long-running requests.
+
+## Base placeholder
+- Include `CUBIXLES_BASE_CONTRACT_ADDRESS` in `.env.example` as a placeholder; not used in runtime yet.
