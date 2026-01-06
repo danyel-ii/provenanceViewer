@@ -10,3 +10,5 @@
 /.env.production.local
 # Mac OS
 .DS_Store
+.vercel
+.env*.local

@@ -65,3 +65,10 @@ Acceptance:
 - [x] Add `all=true` aggregation with a max-page safety cap
 - [x] Document pagination + BASE placeholder env vars
 - [x] Validate `/api/token/:id`, `/api/token/:id/provenance`, `/api/token/:id/verify`
+
+---
+
+## Phase H — Token list quick inspect
+- [x] Add a frontend list for `/api/poc/tokens` with pagination + all-mode
+- [x] Style the list to match the existing landing panels
+- [x] Verify the list loads on local dev

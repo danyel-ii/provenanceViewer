@@ -5,6 +5,7 @@ import { useCallback, useMemo, useState } from "react";
 import LandingHero from "../_components/LandingHero";
 import MintAuditPanel from "../_components/MintAuditPanel";
 import ProvenancePanel from "../_components/ProvenancePanel";
+import TokenIndexPanel from "../_components/TokenIndexPanel";
 import {
   CANONICAL_FACE_ORDER,
   CANONICAL_OWNERSHIP_HISTORY,
@@ -114,6 +115,7 @@ export default function LandingExperience() {
           ))}
         </div>
       </section>
+      <TokenIndexPanel />
       <ProvenancePanel
         mode={mode}
         onModeToggle={toggleMode}
