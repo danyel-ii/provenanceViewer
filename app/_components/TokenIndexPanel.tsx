@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type ChangeEvent } from "react";
 
 type TokenListItem = {
   tokenId: string;
@@ -25,7 +25,8 @@ type TokenListResponse = {
 type TokenListMode = "page" | "all";
 
 const PAGE_SIZE = 8;
-const MAX_PAGES = 25;
+const MAX_PAGES_LIMIT = 50;
+const DEFAULT_MAX_PAGES = 25;
 
 function truncateMiddle(value: string, start = 6, end = 4) {
   if (value.length <= start + end + 3) {
@@ -51,11 +52,13 @@ export default function TokenIndexPanel() {
   const [pageKey, setPageKey] = useState<string | null>(null);
   const [pages, setPages] = useState(1);
   const [truncated, setTruncated] = useState(false);
+  const [maxPages, setMaxPages] = useState(DEFAULT_MAX_PAGES);
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
 
   const isAllMode = mode === "all";
   const hasMore = Boolean(pageKey);
+  const maxPagesId = "token-index-max-pages";
 
   const loadTokens = useCallback(
     async ({
@@ -74,7 +77,7 @@ export default function TokenIndexPanel() {
 
         if (mode === "all") {
           params.set("all", "true");
-          params.set("maxPages", String(MAX_PAGES));
+          params.set("maxPages", String(maxPages));
         } else if (nextPageKey) {
           params.set("pageKey", nextPageKey);
         }
@@ -117,7 +120,7 @@ export default function TokenIndexPanel() {
         setError(message);
       }
     },
-    [mode]
+    [maxPages, mode]
   );
 
   useEffect(() => {
@@ -133,6 +136,15 @@ export default function TokenIndexPanel() {
 
   const handleToggleMode = () => {
     setMode((prev) => (prev === "all" ? "page" : "all"));
+  };
+
+  const handleMaxPagesChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const parsed = Number.parseInt(event.target.value, 10);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+    const clamped = Math.min(Math.max(parsed, 1), MAX_PAGES_LIMIT);
+    setMaxPages(clamped);
   };
 
   const handleRefresh = () => {
@@ -168,13 +180,25 @@ export default function TokenIndexPanel() {
           </p>
         </div>
         <div className="token-index-actions">
+          <label className="token-index-control" htmlFor={maxPagesId}>
+            <span>All-mode max pages</span>
+            <input
+              id={maxPagesId}
+              type="number"
+              min={1}
+              max={MAX_PAGES_LIMIT}
+              value={maxPages}
+              onChange={handleMaxPagesChange}
+              className="token-index-input"
+            />
+          </label>
           <button
             type="button"
             className="landing-button secondary"
             onClick={handleToggleMode}
             disabled={status === "loading"}
           >
-            {isAllMode ? "Use pagination" : `Load all (max ${MAX_PAGES} pages)`}
+            {isAllMode ? "Use pagination" : `Load all (max ${maxPages} pages)`}
           </button>
           {!isAllMode && (
             <button
