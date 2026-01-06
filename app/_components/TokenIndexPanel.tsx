@@ -24,7 +24,8 @@ type TokenListResponse = {
 
 type TokenListMode = "page" | "all";
 
-const PAGE_SIZE = 8;
+const DEFAULT_PAGE_SIZE = 8;
+const PAGE_SIZE_LIMIT = 100;
 const MAX_PAGES_LIMIT = 50;
 const DEFAULT_MAX_PAGES = 25;
 
@@ -52,6 +53,7 @@ export default function TokenIndexPanel() {
   const [pageKey, setPageKey] = useState<string | null>(null);
   const [pages, setPages] = useState(1);
   const [truncated, setTruncated] = useState(false);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [maxPages, setMaxPages] = useState(DEFAULT_MAX_PAGES);
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
@@ -59,6 +61,7 @@ export default function TokenIndexPanel() {
   const isAllMode = mode === "all";
   const hasMore = Boolean(pageKey);
   const maxPagesId = "token-index-max-pages";
+  const pageSizeId = "token-index-page-size";
 
   const loadTokens = useCallback(
     async ({
@@ -73,7 +76,7 @@ export default function TokenIndexPanel() {
 
       try {
         const params = new URLSearchParams();
-        params.set("limit", String(PAGE_SIZE));
+        params.set("limit", String(pageSize));
 
         if (mode === "all") {
           params.set("all", "true");
@@ -120,7 +123,7 @@ export default function TokenIndexPanel() {
         setError(message);
       }
     },
-    [maxPages, mode]
+    [maxPages, mode, pageSize]
   );
 
   useEffect(() => {
@@ -145,6 +148,15 @@ export default function TokenIndexPanel() {
     }
     const clamped = Math.min(Math.max(parsed, 1), MAX_PAGES_LIMIT);
     setMaxPages(clamped);
+  };
+
+  const handlePageSizeChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const parsed = Number.parseInt(event.target.value, 10);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+    const clamped = Math.min(Math.max(parsed, 1), PAGE_SIZE_LIMIT);
+    setPageSize(clamped);
   };
 
   const handleRefresh = () => {
@@ -180,6 +192,18 @@ export default function TokenIndexPanel() {
           </p>
         </div>
         <div className="token-index-actions">
+          <label className="token-index-control" htmlFor={pageSizeId}>
+            <span>Page size</span>
+            <input
+              id={pageSizeId}
+              type="number"
+              min={1}
+              max={PAGE_SIZE_LIMIT}
+              value={pageSize}
+              onChange={handlePageSizeChange}
+              className="token-index-input"
+            />
+          </label>
           <label className="token-index-control" htmlFor={maxPagesId}>
             <span>All-mode max pages</span>
             <input
