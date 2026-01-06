@@ -1,7 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState, type ChangeEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ChangeEvent,
+} from "react";
 
 type TokenListItem = {
   tokenId: string;
@@ -47,21 +53,38 @@ function formatTimestamp(value?: string) {
   return parsed.toISOString().split("T")[0] ?? value;
 }
 
+function useDebouncedValue<T>(value: T, delayMs: number) {
+  const [debounced, setDebounced] = useState(value);
+
+  useEffect(() => {
+    const handle = window.setTimeout(() => {
+      setDebounced(value);
+    }, delayMs);
+
+    return () => window.clearTimeout(handle);
+  }, [value, delayMs]);
+
+  return debounced;
+}
+
 export default function TokenIndexPanel() {
   const [mode, setMode] = useState<TokenListMode>("page");
   const [tokens, setTokens] = useState<TokenListItem[]>([]);
   const [pageKey, setPageKey] = useState<string | null>(null);
   const [pages, setPages] = useState(1);
   const [truncated, setTruncated] = useState(false);
-  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [pageSizeInput, setPageSizeInput] = useState(DEFAULT_PAGE_SIZE);
+  const [pageSizeApplied, setPageSizeApplied] = useState(DEFAULT_PAGE_SIZE);
   const [maxPages, setMaxPages] = useState(DEFAULT_MAX_PAGES);
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
+  const [refreshTick, setRefreshTick] = useState(0);
 
   const isAllMode = mode === "all";
   const hasMore = Boolean(pageKey);
   const maxPagesId = "token-index-max-pages";
   const pageSizeId = "token-index-page-size";
+  const debouncedPageSize = useDebouncedValue(pageSizeInput, 300);
 
   const loadTokens = useCallback(
     async ({
@@ -76,7 +99,7 @@ export default function TokenIndexPanel() {
 
       try {
         const params = new URLSearchParams();
-        params.set("limit", String(pageSize));
+        params.set("limit", String(pageSizeApplied));
 
         if (mode === "all") {
           params.set("all", "true");
@@ -123,12 +146,12 @@ export default function TokenIndexPanel() {
         setError(message);
       }
     },
-    [maxPages, mode, pageSize]
+    [maxPages, mode, pageSizeApplied]
   );
 
   useEffect(() => {
     loadTokens({ reset: true, nextPageKey: null });
-  }, [loadTokens]);
+  }, [loadTokens, refreshTick]);
 
   const handleLoadMore = () => {
     if (status === "loading" || !pageKey || isAllMode) {
@@ -156,11 +179,14 @@ export default function TokenIndexPanel() {
       return;
     }
     const clamped = Math.min(Math.max(parsed, 1), PAGE_SIZE_LIMIT);
-    setPageSize(clamped);
+    setPageSizeInput(clamped);
   };
 
   const handleRefresh = () => {
-    loadTokens({ reset: true, nextPageKey: null });
+    const nextPageSize =
+      debouncedPageSize === pageSizeInput ? debouncedPageSize : pageSizeInput;
+    setPageSizeApplied(nextPageSize);
+    setRefreshTick((prev) => prev + 1);
   };
 
   const statusLabel = useMemo(() => {
@@ -199,7 +225,7 @@ export default function TokenIndexPanel() {
               type="number"
               min={1}
               max={PAGE_SIZE_LIMIT}
-              value={pageSize}
+              value={pageSizeInput}
               onChange={handlePageSizeChange}
               className="token-index-input"
             />
