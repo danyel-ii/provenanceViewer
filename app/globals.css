@@ -31,11 +31,39 @@ a {
   background: radial-gradient(circle at 20% 20%, rgba(10, 12, 20, 0.8), #030305 45%, #000 100%);
 }
 
+.landing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: clamp(20px, 3vw, 36px);
+}
+
 .landing-intro {
   display: flex;
   flex-direction: column;
   gap: 12px;
   max-width: 760px;
+}
+
+.landing-cube-icon {
+  width: clamp(200px, 26vw, 320px);
+  height: clamp(200px, 26vw, 320px);
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+  background: #030305;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.landing-cube-icon .landing-sketch-shell,
+.landing-cube-icon .landing-sketch-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.landing-cube-icon .landing-sketch-fallback {
+  font-size: 11px;
+  padding: 8px;
 }
 
 .landing-entry-grid {
@@ -187,6 +215,12 @@ a {
   background: transparent;
   border-color: rgba(255, 255, 255, 0.35);
   color: #f7f7fa;
+}
+
+.landing-button.platinum {
+  background: linear-gradient(135deg, #f6f3ea, #cfc8b9);
+  color: #101217;
+  box-shadow: 0 10px 24px rgba(210, 205, 190, 0.35);
 }
 
 .landing-button.tertiary {
@@ -1094,6 +1128,7 @@ a {
 }
 
 .token-index-media {
+  position: relative;
   border-radius: 16px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -1102,12 +1137,40 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 0 26px rgba(215, 220, 235, 0.2);
 }
 
 .token-index-media img {
   width: 100%;
   height: auto;
   display: block;
+  filter: grayscale(1) contrast(1.15) brightness(0.72) saturate(0.2);
+  transition: filter 220ms ease, transform 220ms ease;
+}
+
+.token-index-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(230, 236, 255, 0.55), transparent 55%),
+    radial-gradient(circle at 70% 80%, rgba(210, 220, 245, 0.35), transparent 60%),
+    linear-gradient(180deg, rgba(6, 6, 8, 0.6), rgba(0, 0, 0, 0.75));
+  mix-blend-mode: screen;
+  opacity: 0.8;
+  transition: opacity 220ms ease;
+  pointer-events: none;
+}
+
+.token-index-card:hover .token-index-media img,
+.token-index-card:focus-within .token-index-media img {
+  filter: none;
+  transform: scale(1.02);
+}
+
+.token-index-card:hover .token-index-media::after,
+.token-index-card:focus-within .token-index-media::after {
+  opacity: 0;
 }
 
 .token-index-media-placeholder {
@@ -1115,6 +1178,78 @@ a {
   color: rgba(255, 255, 255, 0.6);
   text-align: center;
   padding: 12px;
+}
+
+.frost-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 8;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.daisy-link {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 42px;
+  height: 60px;
+  z-index: 20;
+  filter: drop-shadow(0 8px 16px rgba(160, 175, 230, 0.35));
+  will-change: transform;
+  display: block;
+  transition: filter 180ms ease;
+}
+
+.daisy-link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(238, 245, 255, 0.9), rgba(160, 175, 230, 0.65));
+  clip-path: polygon(50% 0%, 100% 40%, 50% 100%, 0% 40%);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: inset 0 0 18px rgba(255, 255, 255, 0.35);
+  transition: box-shadow 180ms ease, opacity 180ms ease;
+}
+
+.daisy-link::after {
+  content: "";
+  position: absolute;
+  inset: 8px 10px;
+  background: linear-gradient(135deg, rgba(170, 190, 235, 0.7), rgba(80, 95, 140, 0.8));
+  clip-path: polygon(50% 0%, 100% 45%, 50% 100%, 0% 45%);
+  opacity: 0.75;
+  transition: opacity 180ms ease;
+}
+
+.daisy-link:hover,
+.daisy-link:focus-visible {
+  filter: drop-shadow(0 0 24px rgba(235, 240, 255, 0.95))
+    drop-shadow(0 0 36px rgba(205, 215, 245, 0.9));
+}
+
+.daisy-link:hover::before,
+.daisy-link:focus-visible::before {
+  box-shadow: 0 0 32px rgba(240, 244, 255, 0.85),
+    inset 0 0 22px rgba(255, 255, 255, 0.6);
+  animation: platinum-flash 0.5s ease;
+}
+
+.daisy-link:hover::after,
+.daisy-link:focus-visible::after {
+  opacity: 0.95;
+}
+
+@keyframes platinum-flash {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.85;
+  }
 }
 
 .token-index-card-head {
@@ -1174,6 +1309,17 @@ a {
 
   .landing-hero-overlay {
     inset: 14px;
+  }
+}
+
+@media (max-width: 900px) {
+  .landing-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .landing-cube-icon {
+    align-self: flex-end;
   }
 }
 

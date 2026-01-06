@@ -3,14 +3,14 @@ import LandingExperience from "./LandingExperience";
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
 export const metadata = {
-  title: "cubixles_ — Provenance as Composition",
+  title: "cubixles_ — Provenance as building blocks",
   description:
-    "Provenance here is not who owned what — it’s what made what possible.",
+    "Provenance as building blocks, NFTs as materials, and citations as structure.",
   metadataBase: new URL(baseUrl),
   openGraph: {
-    title: "cubixles_ — Provenance as Composition",
+    title: "cubixles_ — Provenance as building blocks",
     description:
-      "cubixles_ mints ERC-721s pairing palette thumbnails with a live cube viewer that insists on compositional provenance.",
+      "Provenance as building blocks, NFTs as materials, and citations as structure.",
     url: "/landing",
     images: [
       {
@@ -22,9 +22,9 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "cubixles_ — Provenance as Composition",
+    title: "cubixles_ — Provenance as building blocks",
     description:
-      "cubixles_ mints ERC-721s pairing palette thumbnails with a live cube viewer that insists on compositional provenance.",
+      "Provenance as building blocks, NFTs as materials, and citations as structure.",
     images: ["/ogImage.png"],
   },
 };

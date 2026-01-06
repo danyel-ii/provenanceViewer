@@ -1,4 +1,6 @@
 import "./globals.css";
+import FloatingDiamonds from "./_components/FloatingDiamonds";
+import FrostOverlay from "./_components/FrostOverlay";
 
 export const metadata = {
   title: "cubixles_ — Provenance as Composition",
@@ -9,7 +11,11 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <FrostOverlay />
+        <FloatingDiamonds />
+        {children}
+      </body>
     </html>
   );
 }
