@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import CollapsiblePanel from "./CollapsiblePanel";
+
 type VerifyResponse = {
   tokenId?: string;
   owner?: string;
@@ -47,15 +49,11 @@ export default function TokenVerifyPanel({ tokenId }: TokenVerifyPanelProps) {
   };
 
   return (
-    <section className="provenance-panel token-verify">
-      <div className="panel-header">
-        <div>
-          <p className="panel-eyebrow">Verification</p>
-          <h2 className="panel-title">Read-only contract check</h2>
-          <p className="panel-subhead">
-            Confirms ownerOf + tokenURI on-chain with no wallet or writes.
-          </p>
-        </div>
+    <CollapsiblePanel
+      eyebrow="Verification"
+      title="Read-only contract check"
+      subhead="Runs server-side ownerOf + tokenURI checks with no wallet connection."
+      actions={
         <button
           type="button"
           className="landing-button primary"
@@ -64,11 +62,12 @@ export default function TokenVerifyPanel({ tokenId }: TokenVerifyPanelProps) {
         >
           {status === "loading" ? "Verifying..." : "Run verification"}
         </button>
-      </div>
-
+      }
+    >
       {status === "idle" && (
         <p className="panel-body-text">
-          Verification is rate limited to protect the RPC endpoint.
+          Verification is rate limited to protect the RPC endpoint. This uses the
+          configured RPC provider only.
         </p>
       )}
 
@@ -96,6 +95,6 @@ export default function TokenVerifyPanel({ tokenId }: TokenVerifyPanelProps) {
           </div>
         </div>
       )}
-    </section>
+    </CollapsiblePanel>
   );
 }

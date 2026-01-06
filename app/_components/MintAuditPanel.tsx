@@ -7,8 +7,16 @@ type MintAuditPanelProps = {
   focusTokenId?: string;
 };
 
+function truncateMiddle(value: string, start = 6, end = 4) {
+  if (value.length <= start + end + 3) {
+    return value;
+  }
+  return `${value.slice(0, start)}...${value.slice(-end)}`;
+}
+
 export default function MintAuditPanel({ focusTokenId }: MintAuditPanelProps) {
   const tokenId = focusTokenId ?? MINT_AUDIT.tokenId;
+  const truncatedTokenId = truncateMiddle(tokenId);
 
   return (
     <section className="mint-audit-panel">
@@ -17,8 +25,8 @@ export default function MintAuditPanel({ focusTokenId }: MintAuditPanelProps) {
           <p className="panel-eyebrow">Audit + provenance mapping</p>
           <h2 className="panel-title">{MINT_AUDIT.title}</h2>
           <p className="panel-subhead">{MINT_AUDIT.tagline}</p>
-          <p className="panel-note">
-            Centered on token {tokenId}. Data captured from the live mint page and the public metadata it publishes.
+          <p className="panel-note" title={tokenId}>
+            Centered on token {truncatedTokenId}. Data captured from the live mint page and the public metadata it publishes.
           </p>
         </div>
         <PanelExplanation

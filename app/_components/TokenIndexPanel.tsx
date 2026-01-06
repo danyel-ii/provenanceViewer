@@ -9,11 +9,22 @@ import {
   type ChangeEvent,
 } from "react";
 
+import FallbackImage from "./FallbackImage";
+
+type TokenMedia = {
+  gateway?: string;
+  raw?: string;
+  thumbnail?: string;
+  format?: string;
+};
+
 type TokenListItem = {
   tokenId: string;
   title?: string;
   name?: string;
   description?: string;
+  metadata?: Record<string, unknown> | null;
+  media?: TokenMedia[];
   mint?: {
     timestamp?: string;
     transactionHash?: string;
@@ -51,6 +62,68 @@ function formatTimestamp(value?: string) {
     return value;
   }
   return parsed.toISOString().split("T")[0] ?? value;
+}
+
+function resolveGatewayUrl(value: string): string {
+  if (value.startsWith("ipfs://") || value.toLowerCase().startsWith("ipfs://")) {
+    const path = value.replace(/^ipfs:\/\/ipfs\//i, "").replace(/^ipfs:\/\//i, "");
+    return `https://ipfs.io/ipfs/${path}`;
+  }
+  if (value.startsWith("ar://") || value.toLowerCase().startsWith("ar://")) {
+    const path = value.replace(/^ar:\/\//i, "");
+    return `https://arweave.net/${path}`;
+  }
+  return value;
+}
+
+function uniqueStrings(values: string[]) {
+  return Array.from(new Set(values.filter(Boolean)));
+}
+
+function extractStringValues(value: unknown): string[] {
+  if (!value) {
+    return [];
+  }
+  if (typeof value === "string") {
+    return [value];
+  }
+  if (Array.isArray(value)) {
+    return value.flatMap((entry) => extractStringValues(entry));
+  }
+  if (typeof value === "object") {
+    return Object.values(value as Record<string, unknown>).flatMap((entry) =>
+      extractStringValues(entry)
+    );
+  }
+  return [];
+}
+
+function getTokenImageCandidates(token: TokenListItem): string[] {
+  const candidates: string[] = [];
+  const mediaCandidates =
+    token.media?.flatMap((media) =>
+      [media.gateway, media.thumbnail, media.raw]
+        .filter(Boolean)
+        .map((entry) => resolveGatewayUrl(entry as string))
+    ) ?? [];
+  candidates.push(...mediaCandidates);
+
+  if (token.metadata) {
+    const metadataImage = token.metadata.image ??
+      token.metadata.image_url ??
+      token.metadata.imageUrl ??
+      token.metadata.imageURI ??
+      token.metadata.image_uri ??
+      token.metadata.preview ??
+      token.metadata.thumbnail;
+    candidates.push(
+      ...extractStringValues(metadataImage).map((entry) =>
+        resolveGatewayUrl(entry)
+      )
+    );
+  }
+
+  return uniqueStrings(candidates);
 }
 
 function useDebouncedValue<T>(value: T, delayMs: number) {
@@ -274,19 +347,34 @@ export default function TokenIndexPanel() {
       <p className="token-index-status">{statusLabel}</p>
       {error && <p className="token-index-error">Error: {error}</p>}
 
-      <div className="token-index-grid">
+      <div className="token-index-carousel">
         {tokens.map((token) => {
-          const displayTitle =
+          const shortTokenId = truncateMiddle(token.tokenId);
+          const displayTitleRaw =
             token.title ?? token.name ?? `Token ${token.tokenId}`;
+          const displayTitle = displayTitleRaw.includes(token.tokenId)
+            ? displayTitleRaw.replace(token.tokenId, shortTokenId)
+            : displayTitleRaw;
+          const imageCandidates = getTokenImageCandidates(token);
           return (
             <article key={token.tokenId} className="token-index-card">
+              <div className="token-index-media">
+                <FallbackImage
+                  candidates={imageCandidates}
+                  alt={`Token ${token.tokenId} preview`}
+                  placeholderClassName="token-index-media-placeholder"
+                  placeholderLabel="No preview resolved"
+                />
+              </div>
               <div className="token-index-card-head">
                 <span className="panel-face-label">Token</span>
-                <span className="token-index-id">
+                <span className="token-index-id" title={token.tokenId}>
                   {truncateMiddle(token.tokenId)}
                 </span>
               </div>
-              <p className="token-index-title">{displayTitle}</p>
+              <p className="token-index-title" title={displayTitleRaw}>
+                {displayTitle}
+              </p>
               {token.description && (
                 <p className="token-index-copy">{token.description}</p>
               )}

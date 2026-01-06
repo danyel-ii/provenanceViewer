@@ -1,131 +1,118 @@
-"use client";
-
 import Link from "next/link";
-import { useCallback, useMemo, useState } from "react";
-import LandingHero from "../_components/LandingHero";
-import MintAuditPanel from "../_components/MintAuditPanel";
-import ProvenancePanel from "../_components/ProvenancePanel";
 import TokenIndexPanel from "../_components/TokenIndexPanel";
-import {
-  CANONICAL_FACE_ORDER,
-  CANONICAL_OWNERSHIP_HISTORY,
-  CANONICAL_OWNERSHIP_NOTE,
-  FACE_REGISTRY,
-  FaceDefinition,
-} from "../_data/landing-provenance";
 import { getAllMintedCubes } from "../_data/minted-cube";
 
-type ProvenanceMode = "compositional" | "custody";
+function truncateMiddle(value: string, start = 6, end = 4) {
+  if (value.length <= start + end + 3) {
+    return value;
+  }
+  return `${value.slice(0, start)}...${value.slice(-end)}`;
+}
 
 export default function LandingExperience() {
-  const [activeFaceId, setActiveFaceId] = useState<FaceDefinition["id"]>(FACE_REGISTRY[0].id);
-  const [mode, setMode] = useState<ProvenanceMode>("compositional");
-  const mintedCubes = useMemo(() => getAllMintedCubes(), []);
-
-  const handleFaceChange = useCallback((faceId: FaceDefinition["id"]) => {
-    setActiveFaceId(faceId);
-  }, []);
-
-  const toggleMode = useCallback(() => {
-    setMode((prev) => (prev === "compositional" ? "custody" : "compositional"));
-  }, []);
-
-  const activeFace =
-    FACE_REGISTRY.find((face) => face.id === activeFaceId) ?? FACE_REGISTRY[0];
-
-  const visualFaces = useMemo(() => {
-    const startIndex = FACE_REGISTRY.findIndex((face) => face.id === activeFaceId);
-    if (startIndex === -1) {
-      return FACE_REGISTRY;
-    }
-    return [
-      ...FACE_REGISTRY.slice(startIndex),
-      ...FACE_REGISTRY.slice(0, startIndex),
-    ];
-  }, [activeFaceId]);
-
-  const canonicalFaces = useMemo(
-    () =>
-      CANONICAL_FACE_ORDER.map((id) => FACE_REGISTRY.find((face) => face.id === id)).filter(
-        (face): face is FaceDefinition => Boolean(face)
-      ),
-    []
-  );
+  const mintedCubes = getAllMintedCubes();
+  const featuredCube = mintedCubes[0];
+  const featuredTokenId = featuredCube?.tokenId ?? "1";
+  const featuredTokenLabel = truncateMiddle(featuredTokenId);
 
   return (
     <main className="landing-page">
-      <LandingHero onFaceChange={handleFaceChange} />
-      <section className="landing-vision">
-        <div>
-          <p className="panel-eyebrow">Purpose</p>
-          <h2 className="landing-section-title">Cubixles_ is provenance as material.</h2>
-          <p className="landing-section-copy">
-            Every cube pairs six NFTs you already own with a live viewer that refuses to flatten
-            their stories. References, palettes, and hashes stay visible so curators can trace
-            each selection back to the wallets, networks, and citations that inspired them.
+      <section className="landing-intro">
+        <p className="panel-eyebrow">Cubixles_ provenance viewer</p>
+        <h1 className="landing-title">cubixles_ provenance viewer</h1>
+        <p className="landing-subhead">Read-only inspection for ERC-721 provenance.</p>
+        <p className="landing-body">
+          Explore minted cubes, drill into token metadata, and review provenance candidates.
+          The viewer never connects a wallet and never writes on-chain.
+        </p>
+        <div className="landing-ctas">
+          <Link href="/m/1" className="landing-button primary">
+            Open /m/1
+          </Link>
+          <Link
+            href={`/token/${featuredTokenId}`}
+            className="landing-button secondary"
+          >
+            Inspect token {featuredTokenLabel}
+          </Link>
+          <Link href="#token-list" className="landing-button tertiary">
+            Browse token list
+          </Link>
+        </div>
+      </section>
+
+      <section className="landing-entry-grid">
+        <article className="provenance-panel landing-entry-card">
+          <p className="panel-eyebrow">Entry 01</p>
+          <h2 className="panel-title">Inspect a minted cube</h2>
+          <p className="landing-entry-route">Route: /m/:tokenId (alias /m/1)</p>
+          <p className="landing-entry-copy">
+            The cube view shows resolved media, the six reference faces, and the provenance
+            narrative captured at mint time.
           </p>
-        </div>
-        <div className="landing-vision-meta">
-          <span>Network: Ethereum mainnet (ERC-721)</span>
-          <span>Authority: compositional provenance, not just custody</span>
-          <span>Price mechanic: dynamic mint cost (base 0.0015 ETH, resale 5%)</span>
-        </div>
-      </section>
-      <section className="landing-mint-gallery">
-        <div className="landing-mint-gallery-heading">
-          <div>
-            <p className="panel-eyebrow">Minting registry</p>
-            <h3 className="landing-section-title">Inspect any cubixles_</h3>
-            <p className="landing-section-copy">
-              Every minted cube publishes the citations that contributed to its faces. Start with
-              the canonical cubixles_ #6885… token view, or jump straight to alias routes like /m/1.
-            </p>
+          <div className="landing-ctas">
+            <Link href="/m/1" className="landing-button secondary">
+              Open example cube
+            </Link>
+            {featuredCube?.tokenViewUrl && (
+              <a
+                href={featuredCube.tokenViewUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="landing-button tertiary"
+              >
+                Open mint gallery
+              </a>
+            )}
           </div>
-        </div>
-        <div className="landing-mint-gallery-list">
-          {mintedCubes.map((cube) => (
-            <article key={cube.tokenId} className="mint-gallery-card">
-              <div className="mint-gallery-card-head">
-                <span className="panel-face-label">Token</span>
-                <h4 className="panel-ref-title">{cube.tokenId}</h4>
-              </div>
-              <p className="mint-gallery-card-network">{cube.network}</p>
-              <p className="mint-gallery-card-copy">{cube.description}</p>
-              <div className="mint-gallery-card-meta">
-                <span>Minted {cube.mintedAt}</span>
-                <span>{cube.mintedBy}</span>
-              </div>
-              <div className="mint-gallery-card-actions">
-                <Link
-                  href={`/m/${cube.tokenId}`}
-                  className="landing-button secondary"
-                >
-                  Inspect token
-                </Link>
-                <a
-                  className="landing-button tertiary"
-                  href={cube.tokenViewUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Open mint view
-                </a>
-              </div>
-            </article>
-          ))}
-        </div>
+        </article>
+
+        <article className="provenance-panel landing-entry-card">
+          <p className="panel-eyebrow">Entry 02</p>
+          <h2 className="panel-title">Inspect a specific token</h2>
+          <p className="landing-entry-route">Route: /token/:id</p>
+          <p className="landing-entry-copy">
+            Token pages include resolved metadata, provenance candidates, and a server-side
+            read-only contract check.
+          </p>
+          <div className="landing-ctas">
+            <Link
+              href={`/token/${featuredTokenId}`}
+              className="landing-button secondary"
+            >
+              Inspect token {featuredTokenLabel}
+            </Link>
+            <Link href="#token-list" className="landing-button tertiary">
+              Find a token id
+            </Link>
+          </div>
+        </article>
+
+        <article className="provenance-panel landing-entry-card">
+          <p className="panel-eyebrow">Entry 03</p>
+          <h2 className="panel-title">Browse the collection index</h2>
+          <p className="landing-entry-route">Route: /api/poc/tokens</p>
+          <p className="landing-entry-copy">
+            Use the live index to page through the collection and jump into any token detail
+            view.
+          </p>
+          <div className="landing-ctas">
+            <Link href="#token-list" className="landing-button secondary">
+              Jump to list
+            </Link>
+            <Link
+              href="/api/poc/tokens?limit=8"
+              className="landing-button tertiary"
+            >
+              Open API sample
+            </Link>
+          </div>
+        </article>
       </section>
-      <TokenIndexPanel />
-      <ProvenancePanel
-        mode={mode}
-        onModeToggle={toggleMode}
-        activeFace={activeFace}
-        visualFaces={visualFaces}
-        canonicalFaces={canonicalFaces}
-        ownershipHistory={CANONICAL_OWNERSHIP_HISTORY}
-        ownershipNote={CANONICAL_OWNERSHIP_NOTE}
-      />
-      <MintAuditPanel />
+
+      <section id="token-list" className="landing-token-list">
+        <TokenIndexPanel />
+      </section>
     </main>
   );
 }

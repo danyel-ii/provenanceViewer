@@ -31,6 +31,43 @@ a {
   background: radial-gradient(circle at 20% 20%, rgba(10, 12, 20, 0.8), #030305 45%, #000 100%);
 }
 
+.landing-intro {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 760px;
+}
+
+.landing-entry-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.landing-entry-card {
+  gap: 14px;
+}
+
+.landing-entry-route {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.landing-entry-copy {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.6;
+}
+
+.landing-token-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .landing-hero {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -180,6 +217,49 @@ a {
   gap: 16px;
 }
 
+.panel-collapsible {
+  position: relative;
+}
+
+.panel-collapsible-header {
+  cursor: pointer;
+}
+
+.panel-collapsible-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.panel-collapse-toggle {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: transparent;
+  color: #f7f7fa;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.panel-collapsible-body {
+  display: grid;
+  gap: 16px;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition: max-height 220ms ease, opacity 220ms ease;
+}
+
+.panel-collapsible.expanded .panel-collapsible-body {
+  max-height: 9999px;
+  opacity: 1;
+  overflow: visible;
+  pointer-events: auto;
+}
+
 .panel-eyebrow {
   margin: 0;
   font-size: 11px;
@@ -191,6 +271,7 @@ a {
 .panel-title {
   margin: 4px 0 0;
   font-size: 1.5rem;
+  overflow-wrap: anywhere;
 }
 
 .panel-toggle {
@@ -248,6 +329,7 @@ a {
 
 .panel-ref-title {
   font-weight: 600;
+  overflow-wrap: anywhere;
 }
 
 .panel-ref-hash {
@@ -255,6 +337,7 @@ a {
   font-size: 11px;
   letter-spacing: 0.2em;
   color: rgba(255, 255, 255, 0.45);
+  overflow-wrap: anywhere;
 }
 
 .panel-active-face,
@@ -292,6 +375,7 @@ a {
   font-size: 12px;
   letter-spacing: 0.2em;
   color: rgba(255, 255, 255, 0.5);
+  overflow-wrap: anywhere;
 }
 
 .panel-face-desc {
@@ -307,6 +391,7 @@ a {
   color: rgba(255, 255, 255, 0.5);
   letter-spacing: 0.15em;
   text-transform: uppercase;
+  overflow-wrap: anywhere;
 }
 
 .panel-subhead {
@@ -567,6 +652,66 @@ a {
   font-size: 13px;
 }
 
+.minted-cube-media {
+  display: grid;
+  grid-template-columns: minmax(220px, 320px) 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.minted-cube-media-frame {
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: radial-gradient(circle at top, rgba(20, 24, 40, 0.7), rgba(2, 3, 7, 0.95));
+  min-height: 220px;
+}
+
+.minted-cube-media-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.minted-cube-media-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 220px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  padding: 12px;
+}
+
+.minted-cube-media-link {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.minted-cube-media-caption {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  justify-content: center;
+}
+
+.minted-cube-media-id {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .provenance-explorer-heading {
   display: flex;
   flex-direction: column;
@@ -600,6 +745,7 @@ a {
   font-size: 14px;
   color: rgba(247, 247, 252, 0.76);
   line-height: 1.45;
+  overflow-wrap: anywhere;
 }
 
 .provenance-card-meta {
@@ -610,6 +756,7 @@ a {
   letter-spacing: 0.08em;
   color: rgba(255, 255, 255, 0.55);
   text-transform: uppercase;
+  overflow-wrap: anywhere;
 }
 
 .provenance-card-links {
@@ -647,9 +794,82 @@ a {
   border: 1px solid rgba(255, 255, 255, 0.08);
   padding: 16px;
   background: rgba(255, 255, 255, 0.02);
+  display: grid;
+  grid-template-columns: minmax(220px, 320px) 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.provenance-face-media {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: radial-gradient(circle at top, rgba(18, 22, 38, 0.7), rgba(2, 3, 7, 0.95));
+  min-height: 220px;
+}
+
+.provenance-face-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.provenance-face-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 220px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  padding: 12px;
+}
+
+.provenance-face-info {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.provenance-media-link {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.provenance-card-media {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: radial-gradient(circle at top, rgba(18, 22, 38, 0.7), rgba(2, 3, 7, 0.95));
+  min-height: 140px;
+}
+
+.provenance-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.provenance-card-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 140px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  padding: 10px;
 }
 
 .provenance-card-highlight {
@@ -773,6 +993,7 @@ a {
   margin: 0;
   color: rgba(255, 255, 255, 0.75);
   line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .mint-gallery-card-meta {
@@ -782,6 +1003,7 @@ a {
   font-size: 12px;
   color: rgba(255, 255, 255, 0.55);
   letter-spacing: 0.08em;
+  overflow-wrap: anywhere;
 }
 
 .mint-gallery-card-actions {
@@ -834,10 +1056,29 @@ a {
   color: #ffb4b4;
 }
 
-.token-index-grid {
+.token-index-carousel {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 14px;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(220px, 280px);
+  gap: 18px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scroll-snap-type: x mandatory;
+  scroll-padding: 12px;
+}
+
+.token-index-carousel::-webkit-scrollbar {
+  height: 6px;
+}
+
+.token-index-carousel::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+}
+
+.token-index-carousel::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
 }
 
 .token-index-card {
@@ -848,6 +1089,32 @@ a {
   flex-direction: column;
   gap: 10px;
   background: rgba(255, 255, 255, 0.02);
+  scroll-snap-align: start;
+  min-width: 0;
+}
+
+.token-index-media {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: radial-gradient(circle at top, rgba(20, 24, 40, 0.7), rgba(2, 3, 7, 0.95));
+  min-height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.token-index-media img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.token-index-media-placeholder {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  padding: 12px;
 }
 
 .token-index-card-head {
@@ -867,6 +1134,7 @@ a {
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
+  overflow-wrap: anywhere;
 }
 
 .token-index-copy {
@@ -874,6 +1142,11 @@ a {
   font-size: 13px;
   line-height: 1.5;
   color: rgba(255, 255, 255, 0.72);
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .token-index-meta {
@@ -981,6 +1254,69 @@ a {
   text-align: right;
 }
 
+.token-reference-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.token-reference-card {
+  background: rgba(6, 8, 14, 0.7);
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.token-reference-image-frame {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: radial-gradient(circle at top, rgba(20, 24, 40, 0.7), rgba(2, 3, 7, 0.95));
+  min-height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.token-reference-image-frame img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.token-reference-placeholder {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  padding: 12px;
+}
+
+.token-reference-meta {
+  display: grid;
+  gap: 4px;
+}
+
+.token-reference-id {
+  font-size: 14px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.token-reference-floor {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.token-reference-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .token-metadata-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -1002,6 +1338,9 @@ a {
   padding: 16px;
   max-height: 320px;
   overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
   font-size: 12px;
   line-height: 1.6;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
@@ -1031,6 +1370,7 @@ a {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  min-width: 0;
 }
 
 .token-provenance-header {
@@ -1044,12 +1384,14 @@ a {
   margin: 6px 0 0;
   font-size: 18px;
   letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
 }
 
 .token-provenance-source {
   margin: 0;
   font-size: 13px;
   color: rgba(255, 255, 255, 0.6);
+  overflow-wrap: anywhere;
 }
 
 .token-pill {
@@ -1086,6 +1428,7 @@ a {
   gap: 6px;
   font-size: 12px;
   color: rgba(255, 255, 255, 0.7);
+  overflow-wrap: anywhere;
 }
 
 .token-evidence strong {
@@ -1105,6 +1448,8 @@ a {
   gap: 2px;
   font-size: 12px;
   color: rgba(255, 255, 255, 0.65);
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .token-verify {
@@ -1128,6 +1473,14 @@ a {
 
 @media (max-width: 900px) {
   .token-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .minted-cube-media {
+    grid-template-columns: 1fr;
+  }
+
+  .provenance-face-detail {
     grid-template-columns: 1fr;
   }
 

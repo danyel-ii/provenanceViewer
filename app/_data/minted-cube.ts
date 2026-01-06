@@ -1,15 +1,25 @@
 import type { FaceId } from "./landing-provenance";
 import { MINT_AUDIT } from "./mint-audit";
 
+export type NftMedia = {
+  image: string | null;
+  animation: string | null;
+  imageCandidates: string[];
+  animationCandidates: string[];
+};
+
 export type CubeProvenanceNFT = {
   faceId: FaceId;
   title: string;
   collection: string;
   tokenId: string;
+  contractAddress?: string;
+  chainId?: number;
   ownerNote: string;
   description: string;
   explorerUrl: string;
   metadataUrl?: string;
+  media?: NftMedia;
 };
 
 export type MintedCube = {
@@ -27,6 +37,7 @@ export type MintedCube = {
     detail: string;
     reference?: { label: string; url: string };
   }[];
+  media?: NftMedia;
 };
 
 export const CUBIXLES_MINTED_CUBES: Record<string, MintedCube> = {

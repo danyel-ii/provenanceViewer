@@ -3,11 +3,63 @@
 import { useEffect, useMemo, useState } from "react";
 
 import type { MintedCube } from "../_data/minted-cube";
+import FallbackImage from "./FallbackImage";
 
 type CubeProvenanceExplorerProps = {
   cube: MintedCube;
   requestedTokenId: string;
 };
+
+function truncateMiddle(value: string, start = 6, end = 4) {
+  if (value.length <= start + end + 3) {
+    return value;
+  }
+  return `${value.slice(0, start)}...${value.slice(-end)}`;
+}
+
+function getOpenSeaCollectionUrl(explorerUrl?: string | null): string | null {
+  if (!explorerUrl) {
+    return null;
+  }
+
+  try {
+    const url = new URL(explorerUrl);
+    if (!url.hostname.includes("opensea.io")) {
+      return null;
+    }
+
+    const segments = url.pathname.split("/").filter(Boolean);
+    if (!segments.length) {
+      return null;
+    }
+
+    if (segments[0] === "collection" && segments[1]) {
+      return `${url.origin}/collection/${segments[1]}`;
+    }
+
+    if (segments[0] === "assets" && segments[1] && segments[2]) {
+      return `${url.origin}/assets/${segments[1]}/${segments[2]}`;
+    }
+
+    if (segments[0] === "assets" && segments[1]) {
+      return `${url.origin}/assets/${segments[1]}`;
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
+function getMediaCandidates(media?: MintedCube["media"]) {
+  if (media?.imageCandidates?.length) {
+    return media.imageCandidates;
+  }
+  if (media?.image) {
+    return [media.image];
+  }
+  return [];
+}
 
 export default function CubeProvenanceExplorer({
   cube,
@@ -29,17 +81,26 @@ export default function CubeProvenanceExplorer({
   );
 
   const isMismatch = cube.tokenId !== requestedTokenId;
+  const truncatedCubeTokenId = truncateMiddle(cube.tokenId);
+  const selectedFaceCollectionUrl = selectedFace
+    ? getOpenSeaCollectionUrl(selectedFace.explorerUrl)
+    : null;
 
   return (
     <section className="minted-cube-panel">
       <div className="minted-cube-panel-heading">
         <div>
           <p className="panel-eyebrow">Minted cube inspector</p>
-          <h2 className="panel-title">Investigating cubixles_ #{cube.tokenId}</h2>
+          <h2
+            className="panel-title"
+            title={`cubixles_ #${cube.tokenId}`}
+          >
+            Investigating cubixles_ #{truncatedCubeTokenId}
+          </h2>
           <p className="panel-subhead">{cube.description}</p>
           {isMismatch && (
-            <p className="panel-note">
-              Showing the verified cube for {cube.tokenId} because that is the
+            <p className="panel-note" title={cube.tokenId}>
+              Showing the verified cube for {truncatedCubeTokenId} because that is the
               actual token minted at this position in the series.
             </p>
           )}
@@ -75,6 +136,37 @@ export default function CubeProvenanceExplorer({
         ))}
       </div>
 
+      <div className="minted-cube-media">
+        <div className="minted-cube-media-frame">
+          <FallbackImage
+            candidates={getMediaCandidates(cube.media)}
+            alt={`Cubixles ${cube.tokenId} media`}
+            className="minted-cube-media-image"
+            placeholderClassName="minted-cube-media-placeholder"
+            placeholderLabel="No cube image resolved"
+          />
+          {cube.media?.animation && (
+            <a
+              href={cube.media.animation}
+              target="_blank"
+              rel="noreferrer"
+              className="minted-cube-media-link"
+            >
+              View animation
+            </a>
+          )}
+        </div>
+        <div className="minted-cube-media-caption">
+          <span className="panel-face-label">Cubixles media</span>
+          <span
+            className="minted-cube-media-id"
+            title={cube.tokenId}
+          >
+            Token {truncatedCubeTokenId}
+          </span>
+        </div>
+      </div>
+
       <div className="provenance-explorer-heading">
         <p className="panel-eyebrow">Provenance NFTs</p>
         <p className="panel-subhead">{cube.provenanceNote}</p>
@@ -97,69 +189,64 @@ export default function CubeProvenanceExplorer({
 
       {selectedFace && (
         <div className="provenance-face-detail">
-          <div className="provenance-card-header">
-            <span className="panel-face-label">Face {selectedFace.faceId}</span>
-            <span className="panel-ref-title">{selectedFace.title}</span>
-          </div>
-          <p className="provenance-card-description">{selectedFace.description}</p>
-          <div className="provenance-card-meta">
-            <span>{selectedFace.collection}</span>
-            <span>Token {selectedFace.tokenId}</span>
-          </div>
-          <p className="panel-note">{selectedFace.ownerNote}</p>
-          <div className="provenance-card-links">
-            <a
-              href={selectedFace.explorerUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="mint-audit-reference"
-            >
-              View on-chain
-            </a>
-            {selectedFace.metadataUrl && (
+          <div className="provenance-face-media">
+            <FallbackImage
+              candidates={getMediaCandidates(selectedFace.media)}
+              alt={`${selectedFace.collection} ${selectedFace.tokenId}`}
+              className="provenance-face-image"
+              placeholderClassName="provenance-face-placeholder"
+              placeholderLabel="No face image resolved"
+            />
+            {selectedFace.media?.animation && (
               <a
-                href={selectedFace.metadataUrl}
+                href={selectedFace.media.animation}
                 target="_blank"
                 rel="noreferrer"
-                className="mint-audit-reference"
+                className="provenance-media-link"
               >
-                Metadata snapshot
+                View animation
               </a>
             )}
           </div>
-        </div>
-      )}
-
-      <div className="provenance-grid">
-        {cube.provenanceNFTs.map((nft) => (
-          <article
-            key={`${cube.tokenId}-${nft.faceId}`}
-            className={`provenance-card ${
-              selectedFaceId === nft.faceId ? "provenance-card-highlight" : ""
-            }`}
-          >
+          <div className="provenance-face-info">
             <div className="provenance-card-header">
-              <span className="panel-face-label">Face {nft.faceId}</span>
-              <span className="panel-ref-title">{nft.title}</span>
+              <span className="panel-face-label">Face {selectedFace.faceId}</span>
+              <span className="panel-ref-title">{selectedFace.title}</span>
             </div>
-            <p className="provenance-card-description">{nft.description}</p>
+            <p className="provenance-card-description">{selectedFace.description}</p>
             <div className="provenance-card-meta">
-              <span>{nft.collection}</span>
-              <span>Token {nft.tokenId}</span>
+              <span title={selectedFace.contractAddress ?? selectedFace.collection}>
+                {selectedFace.collection}
+              </span>
+              <span title={selectedFace.tokenId}>
+                Token {truncateMiddle(selectedFace.tokenId)}
+              </span>
             </div>
-            <p className="panel-note">{nft.ownerNote}</p>
+            <p className="panel-note">{selectedFace.ownerNote}</p>
             <div className="provenance-card-links">
-              <a
-                href={nft.explorerUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="mint-audit-reference"
-              >
-                View on-chain
-              </a>
-              {nft.metadataUrl && (
+              {selectedFace.explorerUrl && (
                 <a
-                  href={nft.metadataUrl}
+                  href={selectedFace.explorerUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mint-audit-reference"
+                >
+                  View on-chain
+                </a>
+              )}
+              {selectedFaceCollectionUrl && (
+                <a
+                  href={selectedFaceCollectionUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mint-audit-reference"
+                >
+                  OpenSea collection
+                </a>
+              )}
+              {selectedFace.metadataUrl && (
+                <a
+                  href={selectedFace.metadataUrl}
                   target="_blank"
                   rel="noreferrer"
                   className="mint-audit-reference"
@@ -168,8 +255,78 @@ export default function CubeProvenanceExplorer({
                 </a>
               )}
             </div>
-          </article>
-        ))}
+          </div>
+        </div>
+      )}
+
+      <div className="provenance-grid">
+        {cube.provenanceNFTs.map((nft) => {
+          const collectionUrl = getOpenSeaCollectionUrl(nft.explorerUrl);
+          return (
+            <article
+              key={`${cube.tokenId}-${nft.faceId}`}
+              className={`provenance-card ${
+                selectedFaceId === nft.faceId ? "provenance-card-highlight" : ""
+              }`}
+            >
+              <div className="provenance-card-media">
+                <FallbackImage
+                  candidates={getMediaCandidates(nft.media)}
+                  alt={`${nft.collection} ${nft.tokenId}`}
+                  className="provenance-card-image"
+                  placeholderClassName="provenance-card-placeholder"
+                  placeholderLabel="No face image resolved"
+                />
+              </div>
+              <div className="provenance-card-header">
+                <span className="panel-face-label">Face {nft.faceId}</span>
+                <span className="panel-ref-title">{nft.title}</span>
+              </div>
+              <p className="provenance-card-description">{nft.description}</p>
+              <div className="provenance-card-meta">
+                <span title={nft.contractAddress ?? nft.collection}>
+                  {nft.collection}
+                </span>
+                <span title={nft.tokenId}>
+                  Token {truncateMiddle(nft.tokenId)}
+                </span>
+              </div>
+              <p className="panel-note">{nft.ownerNote}</p>
+              <div className="provenance-card-links">
+                {nft.explorerUrl && (
+                  <a
+                    href={nft.explorerUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mint-audit-reference"
+                  >
+                    View on-chain
+                  </a>
+                )}
+                {collectionUrl && (
+                  <a
+                    href={collectionUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mint-audit-reference"
+                  >
+                    OpenSea collection
+                  </a>
+                )}
+                {nft.metadataUrl && (
+                  <a
+                    href={nft.metadataUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mint-audit-reference"
+                  >
+                    Metadata snapshot
+                  </a>
+                )}
+              </div>
+            </article>
+          );
+        })}
       </div>
 
       <div className="provenance-trail">
