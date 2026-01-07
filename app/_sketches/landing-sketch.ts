@@ -1,5 +1,6 @@
 import type { FaceDefinition } from "../_data/landing-provenance";
 import { FACE_REGISTRY } from "../_data/landing-provenance";
+import { PALETTE_COLORS } from "../_data/paletteColors";
 
 type SketchOptions = {
   onFaceChange: (faceId: FaceDefinition["id"]) => void;
@@ -55,6 +56,8 @@ const COLLAGE_ANCHORS = [
 
 const DRIFT_SPEED = 0.0012;
 const SCALE_RATIO = 0.32;
+const TILE_GRID = 7;
+const TILE_STROKE = [20, 22, 28, 90] as const;
 
 export function createLandingSketch(p5: any, options: SketchOptions) {
   let rotationX = 0;
@@ -203,11 +206,62 @@ export function createLandingSketch(p5: any, options: SketchOptions) {
       return;
     }
     const isActive = faceId === frontFace;
-    const fillColor = p5.color(faceDef.palette.fill);
-    fillColor.setAlpha(isActive ? 220 : 180);
-    p5.fill(fillColor);
+    const alpha = isActive ? 225 : 200;
+    const [p0, p1, p2, p3] = polygon;
+    const edgeAlpha = isActive ? 140 : 90;
+
+    const tileColorIndex = (tileIndex: number) => {
+      const base =
+        faceId.charCodeAt(0) * 31 +
+        faceId.charCodeAt(1) * 17 +
+        tileIndex * 131;
+      return PALETTE_COLORS[base % PALETTE_COLORS.length] ?? "#f5f2f2";
+    };
+
+    const pointOnQuad = (
+      a: { x: number; y: number },
+      b: { x: number; y: number },
+      c: { x: number; y: number },
+      d: { x: number; y: number },
+      u: number,
+      v: number
+    ) => {
+      const ab = { x: p5.lerp(a.x, b.x, u), y: p5.lerp(a.y, b.y, u) };
+      const dc = { x: p5.lerp(d.x, c.x, u), y: p5.lerp(d.y, c.y, u) };
+      return { x: p5.lerp(ab.x, dc.x, v), y: p5.lerp(ab.y, dc.y, v) };
+    };
+
+    p5.stroke(...TILE_STROKE);
+    p5.strokeWeight(0.7);
+
+    for (let row = 0; row < TILE_GRID; row += 1) {
+      for (let col = 0; col < TILE_GRID; col += 1) {
+        const u0 = col / TILE_GRID;
+        const v0 = row / TILE_GRID;
+        const u1 = (col + 1) / TILE_GRID;
+        const v1 = (row + 1) / TILE_GRID;
+        const tileIndex = row * TILE_GRID + col;
+
+        const c0 = pointOnQuad(p0, p1, p2, p3, u0, v0);
+        const c1 = pointOnQuad(p0, p1, p2, p3, u1, v0);
+        const c2 = pointOnQuad(p0, p1, p2, p3, u1, v1);
+        const c3 = pointOnQuad(p0, p1, p2, p3, u0, v1);
+
+        const color = p5.color(tileColorIndex(tileIndex));
+        color.setAlpha(alpha);
+        p5.fill(color);
+        p5.beginShape();
+        p5.vertex(c0.x, c0.y);
+        p5.vertex(c1.x, c1.y);
+        p5.vertex(c2.x, c2.y);
+        p5.vertex(c3.x, c3.y);
+        p5.endShape(p5.CLOSE);
+      }
+    }
+
     p5.stroke(faceDef.palette.border);
-    p5.strokeWeight(1.2);
+    p5.strokeWeight(1.6);
+    p5.noFill();
     p5.beginShape();
     polygon.forEach((vertex) => {
       p5.vertex(vertex.x, vertex.y);
@@ -215,10 +269,9 @@ export function createLandingSketch(p5: any, options: SketchOptions) {
     p5.endShape(p5.CLOSE);
 
     const accentColor = p5.color(faceDef.palette.accent);
-    accentColor.setAlpha(isActive ? 220 : 180);
+    accentColor.setAlpha(edgeAlpha);
     p5.stroke(accentColor);
-    p5.strokeWeight(1.4);
-    p5.noFill();
+    p5.strokeWeight(1.3);
     p5.beginShape();
     polygon.slice(0, 3).forEach((vertex) => {
       p5.vertex(vertex.x, vertex.y);
@@ -227,9 +280,11 @@ export function createLandingSketch(p5: any, options: SketchOptions) {
 
     p5.push();
     p5.noStroke();
-    p5.fill(accentColor);
+    const accentFill = p5.color(faceDef.palette.accent);
+    accentFill.setAlpha(edgeAlpha);
+    p5.fill(accentFill);
     p5.rectMode(p5.CENTER);
-    p5.rect(centroid.x, centroid.y - 7, 24, 3);
+    p5.rect(centroid.x, centroid.y - 7, 22, 3);
     p5.rect(centroid.x - 12, centroid.y + 5, 6, 6);
     p5.rect(centroid.x + 10, centroid.y + 6, 4, 4);
     p5.pop();
