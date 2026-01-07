@@ -1,4 +1,5 @@
 import "./globals.css";
+import AssetPrefixCheck from "./_components/AssetPrefixCheck";
 import FloatingDiamonds from "./_components/FloatingDiamonds";
 import { cubixlesLogoFont } from "./_lib/fonts";
 
@@ -12,6 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={cubixlesLogoFont.variable}>
+        <AssetPrefixCheck />
         <FloatingDiamonds />
         {children}
       </body>

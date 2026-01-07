@@ -148,8 +148,8 @@ a {
 }
 
 .landing-cube-icon {
-  width: clamp(200px, 26vw, 320px);
-  height: clamp(200px, 26vw, 320px);
+  width: clamp(240px, 32vw, 420px);
+  height: clamp(240px, 32vw, 420px);
   border-radius: 22px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   overflow: hidden;
@@ -1495,6 +1495,22 @@ a {
   pointer-events: none;
 }
 
+.token-index-card:first-child .token-index-media img {
+  filter: none;
+}
+
+.token-index-card:first-child .token-index-media::after {
+  opacity: 0;
+}
+
+.token-index-carousel:hover .token-index-card:first-child .token-index-media img {
+  filter: grayscale(1) contrast(1.15) brightness(0.72) saturate(0.2);
+}
+
+.token-index-carousel:hover .token-index-card:first-child .token-index-media::after {
+  opacity: 0.8;
+}
+
 .token-index-card:hover .token-index-media img,
 .token-index-card:focus-within .token-index-media img {
   filter: none;
@@ -1531,7 +1547,7 @@ a {
   z-index: 0;
   transform: translate3d(-50%, -50%, 0) rotate(var(--rotation));
   transition:
-    transform 2s cubic-bezier(0.22, 0.6, 0.2, 1),
+    transform 1.8s cubic-bezier(0.22, 0.6, 0.2, 1),
     opacity 1.3s ease;
   transition-delay: var(--delay);
   will-change: transform, opacity;
@@ -1545,9 +1561,13 @@ a {
   align-items: center;
   gap: 2px;
   z-index: 1;
-  font-size: clamp(3.4rem, 10vw, 7.6rem);
+  font-size: clamp(4rem, 12vw, 9rem);
   color: #1d1a16;
   pointer-events: none;
+  text-shadow:
+    0 0 18px rgba(248, 244, 235, 0.8),
+    0 0 32px rgba(220, 214, 200, 0.6),
+    0 0 54px rgba(200, 192, 176, 0.4);
 }
 
 .notes-logo-letter {
@@ -1603,8 +1623,7 @@ a {
 .cube-note {
   position: absolute;
   border-radius: 5px;
-  opacity: 0.85;
-  mix-blend-mode: multiply;
+  opacity: 0.92;
 }
 
 body.notes-docked .cube-notes {

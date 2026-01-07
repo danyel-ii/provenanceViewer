@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 
 const FLOCK_DELAY_MS = 900;
-const MOVE_DURATION_MS = 2000;
+const MOVE_DURATION_MS = 1800;
 
 export default function NotesFlockAnimator() {
   useEffect(() => {

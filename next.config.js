@@ -6,6 +6,7 @@ const basePath =
 const nextConfig = {
   reactStrictMode: true,
   basePath,
+  assetPrefix: basePath,
   trailingSlash: true,
 };
 
