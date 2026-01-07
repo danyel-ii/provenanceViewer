@@ -6,9 +6,13 @@ import type { FaceDefinition } from "../_data/landing-provenance";
 
 type LandingSketchProps = {
   onFaceChange: (faceId: FaceDefinition["id"]) => void;
+  onRotationChange?: (rotationX: number, rotationY: number) => void;
 };
 
-export default function LandingSketch({ onFaceChange }: LandingSketchProps) {
+export default function LandingSketch({
+  onFaceChange,
+  onRotationChange,
+}: LandingSketchProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [hasError, setHasError] = useState(false);
 
@@ -27,6 +31,7 @@ export default function LandingSketch({ onFaceChange }: LandingSketchProps) {
           (p5: any) =>
             createLandingSketch(p5, {
               onFaceChange,
+              onRotationChange,
               parent: containerRef.current ?? undefined,
             }),
           containerRef.current ?? undefined
@@ -43,7 +48,7 @@ export default function LandingSketch({ onFaceChange }: LandingSketchProps) {
       cancelled = true;
       sketchInstance?.remove();
     };
-  }, [onFaceChange]);
+  }, [onFaceChange, onRotationChange]);
 
   return (
     <div className="landing-sketch-shell">

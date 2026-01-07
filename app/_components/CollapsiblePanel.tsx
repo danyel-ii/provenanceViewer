@@ -11,7 +11,7 @@ import {
 
 type CollapsiblePanelProps = {
   eyebrow?: string;
-  title: string;
+  title: ReactNode;
   subhead?: string;
   actions?: ReactNode;
   children: ReactNode;

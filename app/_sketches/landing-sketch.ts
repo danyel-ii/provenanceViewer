@@ -3,6 +3,7 @@ import { FACE_REGISTRY } from "../_data/landing-provenance";
 
 type SketchOptions = {
   onFaceChange: (faceId: FaceDefinition["id"]) => void;
+  onRotationChange?: (rotationX: number, rotationY: number) => void;
   parent?: HTMLElement;
 };
 
@@ -278,13 +279,15 @@ export function createLandingSketch(p5: any, options: SketchOptions) {
 
   p5.draw = () => {
     p5.clear();
-    p5.background(3, 3, 3);
     const centerX = p5.width / 2;
     const centerY = p5.height / 2;
     const scale = Math.min(p5.width, p5.height) * SCALE_RATIO;
 
     drawBackground(centerX, centerY, scale);
     updateRotation();
+    if (options.onRotationChange) {
+      options.onRotationChange(rotationX, rotationY);
+    }
 
     const rotated = BASE_VERTICES.map((vertex) => rotatePoint(vertex, scale, rotationX, rotationY));
     const projected = rotated.map((vertex) => projectPoint(vertex, centerX, centerY));

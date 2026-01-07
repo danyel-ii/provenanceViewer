@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 
 import type { MintedCube } from "../_data/minted-cube";
 import FallbackImage from "./FallbackImage";
+import CubixlesLogo from "./CubixlesLogo";
+import CubixlesText from "./CubixlesText";
 
 type CubeProvenanceExplorerProps = {
   cube: MintedCube;
@@ -95,9 +97,12 @@ export default function CubeProvenanceExplorer({
             className="panel-title"
             title={`cubixles_ #${cube.tokenId}`}
           >
-            Investigating cubixles_ #{truncatedCubeTokenId}
+            Investigating <CubixlesLogo className="cubixles-logo-inline" /> #
+            {truncatedCubeTokenId}
           </h2>
-          <p className="panel-subhead">{cube.description}</p>
+          <p className="panel-subhead">
+            <CubixlesText text={cube.description} />
+          </p>
           {isMismatch && (
             <p className="panel-note" title={cube.tokenId}>
               Showing the verified cube for {truncatedCubeTokenId} because that is the
@@ -157,7 +162,9 @@ export default function CubeProvenanceExplorer({
           )}
         </div>
         <div className="minted-cube-media-caption">
-          <span className="panel-face-label">Cubixles media</span>
+          <span className="panel-face-label">
+            <CubixlesLogo className="cubixles-logo-inline" /> media
+          </span>
           <span
             className="minted-cube-media-id"
             title={cube.tokenId}
@@ -169,7 +176,9 @@ export default function CubeProvenanceExplorer({
 
       <div className="provenance-explorer-heading">
         <p className="panel-eyebrow">Provenance NFTs</p>
-        <p className="panel-subhead">{cube.provenanceNote}</p>
+        <p className="panel-subhead">
+          <CubixlesText text={cube.provenanceNote} />
+        </p>
       </div>
 
       <div className="provenance-face-tabs">
@@ -213,7 +222,9 @@ export default function CubeProvenanceExplorer({
               <span className="panel-face-label">Face {selectedFace.faceId}</span>
               <span className="panel-ref-title">{selectedFace.title}</span>
             </div>
-            <p className="provenance-card-description">{selectedFace.description}</p>
+            <p className="provenance-card-description">
+              <CubixlesText text={selectedFace.description} />
+            </p>
             <div className="provenance-card-meta">
               <span title={selectedFace.contractAddress ?? selectedFace.collection}>
                 {selectedFace.collection}

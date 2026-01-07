@@ -1,6 +1,8 @@
 "use client";
 
 import PanelExplanation from "./PanelExplanation";
+import CubixlesLogo from "./CubixlesLogo";
+import CubixlesText from "./CubixlesText";
 import { MINT_AUDIT } from "../_data/mint-audit";
 
 type MintAuditPanelProps = {
@@ -23,8 +25,12 @@ export default function MintAuditPanel({ focusTokenId }: MintAuditPanelProps) {
       <div className="panel-header">
         <div>
           <p className="panel-eyebrow">Audit + provenance mapping</p>
-          <h2 className="panel-title">{MINT_AUDIT.title}</h2>
-          <p className="panel-subhead">{MINT_AUDIT.tagline}</p>
+          <h2 className="panel-title">
+            <CubixlesText text={MINT_AUDIT.title} />
+          </h2>
+          <p className="panel-subhead">
+            <CubixlesText text={MINT_AUDIT.tagline} />
+          </p>
           <p className="panel-note" title={tokenId}>
             Centered on token {truncatedTokenId}. Data captured from the live mint page and the public metadata it publishes.
           </p>
@@ -35,7 +41,9 @@ export default function MintAuditPanel({ focusTokenId }: MintAuditPanelProps) {
         />
       </div>
 
-      <p className="panel-body-text">{MINT_AUDIT.summary}</p>
+      <p className="panel-body-text">
+        <CubixlesText text={MINT_AUDIT.summary} />
+      </p>
 
       <div className="mint-audit-grid">
         <div className="mint-audit-card">
@@ -52,7 +60,9 @@ export default function MintAuditPanel({ focusTokenId }: MintAuditPanelProps) {
                 <span className="mint-audit-step-number">{index + 1}</span>
                 <div>
                   <span className="mint-audit-step-label">{step.title}</span>
-                  <p>{step.detail}</p>
+                  <p>
+                    <CubixlesText text={step.detail} />
+                  </p>
                 </div>
               </li>
             ))}
@@ -71,7 +81,9 @@ export default function MintAuditPanel({ focusTokenId }: MintAuditPanelProps) {
             {MINT_AUDIT.mappings.map((mapping) => (
               <li key={mapping.label}>
                 <strong>{mapping.label}</strong>
-                <span>{mapping.detail}</span>
+                <span>
+                  <CubixlesText text={mapping.detail} />
+                </span>
               </li>
             ))}
           </ul>
@@ -82,20 +94,28 @@ export default function MintAuditPanel({ focusTokenId }: MintAuditPanelProps) {
         {MINT_AUDIT.metadataHighlights.map((highlight) => (
           <div key={highlight.label} className="mint-audit-info-row">
             <span className="mint-audit-info-label">{highlight.label}</span>
-            <span className="mint-audit-info-value">{highlight.value}</span>
+            <span className="mint-audit-info-value">
+              <CubixlesText text={highlight.value} />
+            </span>
           </div>
         ))}
         <div className="mint-audit-info-row">
           <span className="mint-audit-info-label">Fees</span>
-          <span className="mint-audit-info-value">{MINT_AUDIT.fees}</span>
+          <span className="mint-audit-info-value">
+            <CubixlesText text={MINT_AUDIT.fees} />
+          </span>
         </div>
         <div className="mint-audit-info-row">
           <span className="mint-audit-info-label">Notes</span>
-          <span className="mint-audit-info-value">{MINT_AUDIT.notes}</span>
+          <span className="mint-audit-info-value">
+            <CubixlesText text={MINT_AUDIT.notes} />
+          </span>
         </div>
         <div className="mint-audit-info-row">
           <span className="mint-audit-info-label">Price mechanic</span>
-          <span className="mint-audit-info-value">{MINT_AUDIT.priceMechanic}</span>
+          <span className="mint-audit-info-value">
+            <CubixlesText text={MINT_AUDIT.priceMechanic} />
+          </span>
         </div>
       </div>
 
@@ -106,7 +126,8 @@ export default function MintAuditPanel({ focusTokenId }: MintAuditPanelProps) {
           rel="noreferrer"
           className="landing-button secondary"
         >
-          View token on cubixles.xyz
+          View token on <CubixlesLogo className="cubixles-logo-tight" />
+          <span>.xyz</span>
         </a>
         <div className="mint-audit-references">
           {MINT_AUDIT.references.map((reference) => (

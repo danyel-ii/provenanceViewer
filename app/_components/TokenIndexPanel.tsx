@@ -10,6 +10,8 @@ import {
 } from "react";
 
 import FallbackImage from "./FallbackImage";
+import CubixlesText from "./CubixlesText";
+import { withBasePath } from "../_lib/basePath";
 
 type TokenMedia = {
   gateway?: string;
@@ -181,9 +183,12 @@ export default function TokenIndexPanel() {
           params.set("pageKey", nextPageKey);
         }
 
-        const response = await fetch(`/api/poc/tokens?${params.toString()}`, {
-          cache: "no-store",
-        });
+        const response = await fetch(
+          withBasePath(`/api/poc/tokens?${params.toString()}`),
+          {
+            cache: "no-store",
+          }
+        );
         const data = (await response.json()) as TokenListResponse & {
           error?: string;
         };
@@ -373,10 +378,12 @@ export default function TokenIndexPanel() {
                 </span>
               </div>
               <p className="token-index-title" title={displayTitleRaw}>
-                {displayTitle}
+                <CubixlesText text={displayTitle} />
               </p>
               {token.description && (
-                <p className="token-index-copy">{token.description}</p>
+                <p className="token-index-copy">
+                  <CubixlesText text={token.description} />
+                </p>
               )}
               <div className="token-index-meta">
                 <span>Minted {formatTimestamp(token.mint?.timestamp)}</span>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { headers } from "next/headers";
 
 import CollapsiblePanel from "../../_components/CollapsiblePanel";
+import CubixlesText from "../../_components/CubixlesText";
 import FallbackImage from "../../_components/FallbackImage";
 import TokenVerifyPanel from "../../_components/TokenVerifyPanel";
 import { resolveMetadataFromObject } from "../../_lib/metadata";
@@ -83,13 +84,20 @@ type TokenReferenceFace = {
 
 function getBaseUrl() {
   const envUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "/inspecta";
+  const normalizedBasePath =
+    basePath && basePath !== "/" ? basePath.replace(/\/$/, "") : "";
   if (envUrl) {
-    return envUrl;
+    return envUrl.endsWith(normalizedBasePath)
+      ? envUrl
+      : `${envUrl}${normalizedBasePath}`;
   }
   const headerList = headers();
   const host = headerList.get("x-forwarded-host") ?? headerList.get("host");
   const proto = headerList.get("x-forwarded-proto") ?? "http";
-  return host ? `${proto}://${host}` : "http://localhost:3000";
+  return host
+    ? `${proto}://${host}${normalizedBasePath}`
+    : `http://localhost:3000${normalizedBasePath}`;
 }
 
 function truncateMiddle(value: string, start = 6, end = 4) {
@@ -502,7 +510,7 @@ export default async function TokenPage({ params }: { params: { id: string } }) 
     <main className="landing-page token-page">
       <CollapsiblePanel
         eyebrow="Token overview"
-        title={displayTitle}
+        title={<CubixlesText text={displayTitle} />}
         subhead="Read-only provenance inspection."
         titleAs="h1"
         collapsible={false}

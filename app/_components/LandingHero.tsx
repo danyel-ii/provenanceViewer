@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import LandingSketch from "./LandingSketch";
+import CubixlesLogo from "./CubixlesLogo";
 import type { FaceDefinition } from "../_data/landing-provenance";
 
 type LandingHeroProps = {
@@ -21,14 +22,16 @@ export default function LandingHero({ onFaceChange }: LandingHeroProps) {
         </div>
       </div>
       <div className="landing-hero-copy">
-        <h1 className="landing-title">cubixles_</h1>
+        <h1 className="landing-title">
+          <CubixlesLogo />
+        </h1>
         <p className="landing-subhead">
           A provenance cube: NFTs as materials, citations as structure.
         </p>
         <p className="landing-body">
-          cubixles_ mints ERC-721s that pair a palette thumbnail with a live cube viewer. You
-          choose 1–6 NFTs you own; the cube displays them as faces while sealing their full
-          provenance in metadata.
+          <CubixlesLogo className="cubixles-logo-inline" /> mints ERC-721s that pair a
+          palette thumbnail with a live cube viewer. You choose 1–6 NFTs you own; the cube
+          displays them as faces while sealing their full provenance in metadata.
         </p>
         <div className="landing-ctas">
           <Link href="/" className="landing-button primary">

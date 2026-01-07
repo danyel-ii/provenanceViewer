@@ -1,6 +1,6 @@
 import "./globals.css";
 import FloatingDiamonds from "./_components/FloatingDiamonds";
-import FrostOverlay from "./_components/FrostOverlay";
+import { cubixlesLogoFont } from "./_lib/fonts";
 
 export const metadata = {
   title: "cubixles_ — Provenance as Composition",
@@ -11,8 +11,7 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>
-        <FrostOverlay />
+      <body className={cubixlesLogoFont.variable}>
         <FloatingDiamonds />
         {children}
       </body>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import CollapsiblePanel from "./CollapsiblePanel";
+import { withBasePath } from "../_lib/basePath";
 
 type VerifyResponse = {
   tokenId?: string;
@@ -29,7 +30,7 @@ export default function TokenVerifyPanel({ tokenId }: TokenVerifyPanelProps) {
     setResult(null);
 
     try {
-      const response = await fetch(`/api/token/${tokenId}/verify`, {
+      const response = await fetch(withBasePath(`/api/token/${tokenId}/verify`), {
         method: "POST",
       });
       const data = (await response.json()) as VerifyResponse;

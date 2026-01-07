@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Space+Grotesk:wght@400;600&display=swap");
 
 :root {
   color-scheme: dark;
@@ -29,6 +29,108 @@ a {
   flex-direction: column;
   gap: clamp(24px, 3vw, 48px);
   background: radial-gradient(circle at 20% 20%, rgba(10, 12, 20, 0.8), #030305 45%, #000 100%);
+}
+
+.landing-home {
+  background: #e8e0d4;
+  color: #1d1a16;
+  font-family: "Instrument Sans", "Space Grotesk", system-ui, sans-serif;
+}
+
+.landing-home .landing-subhead,
+.landing-home .landing-body {
+  color: rgba(28, 24, 20, 0.72);
+}
+
+.landing-home .panel-eyebrow {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.landing-home .panel-title {
+  color: #1d1a16;
+}
+
+.landing-home .panel-subhead,
+.landing-home .panel-face-label {
+  color: rgba(28, 24, 20, 0.6);
+}
+
+.landing-home .provenance-panel {
+  background: rgba(244, 239, 231, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: none;
+}
+
+.landing-home .landing-button {
+  border-color: rgba(0, 0, 0, 0.25);
+  color: #1d1a16;
+}
+
+.landing-home .landing-button.primary {
+  background: #101010;
+  color: #f5efe5;
+  box-shadow: none;
+}
+
+.landing-home .landing-button.secondary {
+  background: transparent;
+  border-color: rgba(0, 0, 0, 0.35);
+}
+
+.landing-home .landing-button.platinum {
+  background: linear-gradient(135deg, #f5efe5, #cfc6b4);
+  color: #101010;
+  box-shadow: none;
+}
+
+.landing-home .token-index-input {
+  border-color: rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.6);
+  color: #1d1a16;
+}
+
+.landing-home .token-index-control,
+.landing-home .token-index-meta {
+  color: rgba(28, 24, 20, 0.6);
+}
+
+.landing-home .token-index-status {
+  color: rgba(28, 24, 20, 0.7);
+}
+
+.landing-home .token-index-error {
+  color: #7a1f1f;
+}
+
+.landing-home .token-index-card {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.landing-home .token-index-title,
+.landing-home .token-index-copy,
+.landing-home .token-index-meta,
+.landing-home .token-index-id {
+  color: rgba(28, 24, 20, 0.75);
+}
+
+.landing-home .token-index-title {
+  color: #1d1a16;
+}
+
+.landing-home .token-index-media {
+  background: #141414;
+  border-color: rgba(0, 0, 0, 0.2);
+  box-shadow: none;
+}
+
+.landing-home .landing-cube-icon {
+  border-color: rgba(0, 0, 0, 0.15);
+  background: #e8e0d4;
+  box-shadow:
+    0 0 40px rgba(245, 237, 220, 0.9),
+    0 0 80px rgba(215, 205, 190, 0.55),
+    inset 0 0 26px rgba(255, 255, 255, 0.75);
 }
 
 .landing-header {
@@ -94,6 +196,218 @@ a {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.landing-help .landing-header {
+  align-items: center;
+}
+
+.helpdesk-title {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.helpdesk-title-suffix {
+  font-size: clamp(18px, 2.4vw, 28px);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: rgba(28, 24, 20, 0.6);
+}
+
+.helpdesk-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.helpdesk-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: clamp(16px, 2.4vw, 32px);
+}
+
+.helpdesk-chat,
+.helpdesk-citations {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 20px;
+  padding: clamp(18px, 2vw, 28px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.helpdesk-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 220px;
+  max-height: 420px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.helpdesk-empty {
+  margin: 0;
+  color: rgba(28, 24, 20, 0.6);
+  line-height: 1.6;
+}
+
+.helpdesk-message {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 16px;
+  border-radius: 16px;
+}
+
+.helpdesk-message.user {
+  align-self: flex-end;
+  background: #101010;
+  color: #f5efe5;
+}
+
+.helpdesk-message.assistant {
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  color: #1d1a16;
+}
+
+.helpdesk-message-role {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.helpdesk-message-body {
+  margin: 0;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.helpdesk-form {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.helpdesk-label {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(28, 24, 20, 0.6);
+}
+
+.helpdesk-input {
+  width: 100%;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  padding: 12px 14px;
+  font-family: inherit;
+  background: rgba(255, 255, 255, 0.6);
+  color: #1d1a16;
+  resize: vertical;
+}
+
+.helpdesk-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: rgba(28, 24, 20, 0.7);
+}
+
+.helpdesk-toggle input {
+  accent-color: #101010;
+}
+
+.helpdesk-diagnostics {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px dashed rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.helpdesk-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.helpdesk-field-label {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(28, 24, 20, 0.6);
+}
+
+.helpdesk-field-input {
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  padding: 10px 12px;
+  font-family: inherit;
+  background: rgba(255, 255, 255, 0.7);
+  color: #1d1a16;
+}
+
+.helpdesk-form-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.helpdesk-send {
+  min-width: 160px;
+}
+
+.helpdesk-error {
+  color: #7a1f1f;
+  font-size: 13px;
+}
+
+.helpdesk-citations-title {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+
+.helpdesk-citations-empty {
+  margin: 0;
+  color: rgba(28, 24, 20, 0.6);
+  line-height: 1.5;
+}
+
+.helpdesk-citations-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.helpdesk-citation {
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.helpdesk-citation-path {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 960px) {
+  .helpdesk-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .landing-hero {
@@ -166,6 +480,25 @@ a {
   font-size: clamp(3rem, 5vw, 4.5rem);
   letter-spacing: -0.04em;
   font-weight: 600;
+}
+
+.cubixles-logo {
+  font-family: var(--font-cubixles-logo), "Instrument Sans", "Space Grotesk", system-ui, sans-serif;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  display: inline-block;
+  line-height: 0.9;
+  font-size: inherit;
+}
+
+.cubixles-logo-inline {
+  vertical-align: baseline;
+  margin-right: 6px;
+}
+
+.cubixles-logo-tight {
+  vertical-align: baseline;
+  margin-right: 0;
 }
 
 .landing-subhead {
@@ -1180,76 +1513,130 @@ a {
   padding: 12px;
 }
 
-.frost-overlay {
+.notes-overlay {
   position: fixed;
   inset: 0;
-  z-index: 8;
+  z-index: 30;
   pointer-events: none;
-  mix-blend-mode: screen;
+  opacity: 1;
+  overflow: hidden;
+  transition: opacity 520ms ease;
 }
 
-.daisy-link {
+.notes-tile {
+  position: absolute;
+  border-radius: 6px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
+  opacity: 1;
+  z-index: 0;
+  transform: translate3d(-50%, -50%, 0) rotate(var(--rotation));
+  transition:
+    transform 2s cubic-bezier(0.22, 0.6, 0.2, 1),
+    opacity 1.3s ease;
+  transition-delay: var(--delay);
+  will-change: transform, opacity;
+}
+
+.notes-logo {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
+  z-index: 1;
+  font-size: clamp(3.4rem, 10vw, 7.6rem);
+  color: #1d1a16;
+  pointer-events: none;
+}
+
+.notes-logo-letter {
+  display: inline-block;
+  transition:
+    transform 1.4s ease,
+    opacity 0.8s ease;
+  transition-delay: var(--logo-delay);
+  will-change: transform, opacity;
+}
+
+.notes-logo-letter + .notes-logo-letter {
+  margin-left: -6px;
+}
+
+.notes-overlay.flock .notes-logo-letter {
+  transform: translate3d(var(--logo-x), var(--logo-y), 0) rotate(var(--logo-r));
+  opacity: 0;
+}
+
+.notes-overlay.flock .notes-tile {
+  transform: translate3d(
+      calc(-50% + var(--dx) + var(--cluster-x)),
+      calc(-50% + var(--dy) + var(--cluster-y)),
+      0
+    )
+    scale(0.12)
+    rotate(var(--rotation));
+  opacity: 0.85;
+}
+
+.notes-overlay.dock {
+  opacity: 0;
+}
+
+.landing-cube-icon {
+  position: relative;
+}
+
+.cube-notes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: inherit;
+  z-index: 2;
+  transform-origin: center;
+  transform: rotate(var(--cube-rotation, 0rad));
+  opacity: 0;
+  transition: transform 120ms linear, opacity 600ms ease;
+}
+
+.cube-note {
+  position: absolute;
+  border-radius: 5px;
+  opacity: 0.85;
+  mix-blend-mode: multiply;
+}
+
+body.notes-docked .cube-notes {
+  opacity: 1;
+}
+
+
+.floating-tile {
   position: fixed;
   top: 0;
   left: 0;
-  width: 42px;
-  height: 60px;
+  width: 72px;
+  height: 72px;
   z-index: 20;
-  filter: drop-shadow(0 8px 16px rgba(160, 175, 230, 0.35));
-  will-change: transform;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow:
+    0 10px 20px rgba(0, 0, 0, 0.25),
+    inset 0 0 14px rgba(255, 255, 255, 0.2);
+  will-change: transform, filter;
   display: block;
-  transition: filter 180ms ease;
+  cursor: pointer;
+  transition: filter 180ms ease, box-shadow 180ms ease, transform 180ms ease;
 }
 
-.daisy-link::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(238, 245, 255, 0.9), rgba(160, 175, 230, 0.65));
-  clip-path: polygon(50% 0%, 100% 40%, 50% 100%, 0% 40%);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: inset 0 0 18px rgba(255, 255, 255, 0.35);
-  transition: box-shadow 180ms ease, opacity 180ms ease;
-}
-
-.daisy-link::after {
-  content: "";
-  position: absolute;
-  inset: 8px 10px;
-  background: linear-gradient(135deg, rgba(170, 190, 235, 0.7), rgba(80, 95, 140, 0.8));
-  clip-path: polygon(50% 0%, 100% 45%, 50% 100%, 0% 45%);
-  opacity: 0.75;
-  transition: opacity 180ms ease;
-}
-
-.daisy-link:hover,
-.daisy-link:focus-visible {
-  filter: drop-shadow(0 0 24px rgba(235, 240, 255, 0.95))
-    drop-shadow(0 0 36px rgba(205, 215, 245, 0.9));
-}
-
-.daisy-link:hover::before,
-.daisy-link:focus-visible::before {
-  box-shadow: 0 0 32px rgba(240, 244, 255, 0.85),
-    inset 0 0 22px rgba(255, 255, 255, 0.6);
-  animation: platinum-flash 0.5s ease;
-}
-
-.daisy-link:hover::after,
-.daisy-link:focus-visible::after {
-  opacity: 0.95;
-}
-
-@keyframes platinum-flash {
-  0% {
-    opacity: 0.6;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0.85;
-  }
+.floating-tile:hover,
+.floating-tile:focus-visible {
+  filter: drop-shadow(0 0 26px rgba(235, 240, 255, 0.95));
+  box-shadow:
+    0 0 26px rgba(230, 236, 255, 0.85),
+    0 0 42px rgba(220, 230, 255, 0.65),
+    inset 0 0 18px rgba(255, 255, 255, 0.45);
 }
 
 .token-index-card-head {

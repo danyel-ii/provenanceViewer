@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { PALETTE_COLORS } from "../_data/paletteColors";
 
 type DiamondState = {
   x: number;
@@ -12,7 +13,25 @@ type DiamondState = {
 };
 
 const DIAMOND_COUNT = 3;
-const DIAMOND_SIZE = 90;
+const DIAMOND_SIZE = 86;
+
+function seededRandom(seed: number) {
+  let value = seed % 2147483647;
+  if (value <= 0) {
+    value += 2147483646;
+  }
+  return () => {
+    value = (value * 48271) % 2147483647;
+    return value / 2147483647;
+  };
+}
+
+const TILE_COLORS = Array.from({ length: DIAMOND_COUNT }).map((_, index) => {
+  const rand = seededRandom(index + 21);
+  return (
+    PALETTE_COLORS[Math.floor(rand() * PALETTE_COLORS.length)] ?? "#f5efe5"
+  );
+});
 
 function randomBetween(min: number, max: number) {
   return min + Math.random() * (max - min);
@@ -98,7 +117,7 @@ export default function FloatingDiamonds() {
     };
   }, []);
 
-  const coffeeUrl = "https://stuybook.eth.link/coffee.html";
+  const studybookUrl = "https://studybook.eth.link";
 
   return (
     <>
@@ -108,9 +127,10 @@ export default function FloatingDiamonds() {
           ref={(node) => {
             anchorsRef.current[index] = node;
           }}
-          className="daisy-link"
-          href={coffeeUrl}
-          aria-label="Open Coffee"
+          className="floating-tile"
+          href={studybookUrl}
+          aria-label="Open Studybook"
+          style={{ backgroundColor: TILE_COLORS[index] }}
         />
       ))}
     </>
