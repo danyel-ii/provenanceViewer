@@ -8,16 +8,14 @@ type NextData = {
   assetPrefix?: string;
 };
 
-declare global {
-  interface Window {
-    __NEXT_DATA__?: NextData;
-  }
+function getNextData(): NextData | undefined {
+  return (window as Window & { __NEXT_DATA__?: NextData }).__NEXT_DATA__;
 }
 
 export default function AssetPrefixCheck() {
   useEffect(() => {
     const basePath = BASE_PATH && BASE_PATH !== "/" ? BASE_PATH.replace(/\/$/, "") : "";
-    const assetPrefix = window.__NEXT_DATA__?.assetPrefix ?? "";
+    const assetPrefix = getNextData()?.assetPrefix ?? "";
     if (basePath && !assetPrefix.startsWith(basePath)) {
       console.warn(
         "[inspecta] assetPrefix mismatch:",

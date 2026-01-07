@@ -437,6 +437,16 @@ a {
   height: 100%;
 }
 
+.landing-sketch-canvas {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.landing-sketch-canvas canvas {
+  display: block;
+}
+
 .landing-sketch-fallback {
   position: absolute;
   inset: 0;
