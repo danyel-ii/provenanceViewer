@@ -1,4 +1,4 @@
-const RAW_BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "/inspecta";
+const RAW_BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "/inspecta_deck";
 const BASE_PATH =
   RAW_BASE_PATH && RAW_BASE_PATH !== "/" ? RAW_BASE_PATH.replace(/\/$/, "") : "";
 

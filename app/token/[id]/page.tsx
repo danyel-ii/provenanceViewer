@@ -84,7 +84,7 @@ type TokenReferenceFace = {
 
 function getBaseUrl() {
   const envUrl = process.env.NEXT_PUBLIC_BASE_URL;
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "/inspecta";
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "/inspecta_deck";
   const normalizedBasePath =
     basePath && basePath !== "/" ? basePath.replace(/\/$/, "") : "";
   if (envUrl) {
