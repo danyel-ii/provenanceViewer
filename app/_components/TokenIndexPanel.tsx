@@ -154,6 +154,8 @@ export default function TokenIndexPanel() {
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
   const [refreshTick, setRefreshTick] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const isAllMode = mode === "all";
   const hasMore = Boolean(pageKey);
@@ -231,6 +233,29 @@ export default function TokenIndexPanel() {
     loadTokens({ reset: true, nextPageKey: null });
   }, [loadTokens, refreshTick]);
 
+  useEffect(() => {
+    if (!tokens.length) {
+      setActiveIndex(0);
+      return;
+    }
+    setActiveIndex((prev) => (prev < tokens.length ? prev : 0));
+  }, [tokens.length]);
+
+  useEffect(() => {
+    if (!tokens.length || hoveredIndex !== null) {
+      return;
+    }
+    const handle = window.setInterval(() => {
+      setActiveIndex((prev) => {
+        if (!tokens.length) {
+          return 0;
+        }
+        return (prev + 1) % tokens.length;
+      });
+    }, 1500);
+    return () => window.clearInterval(handle);
+  }, [tokens.length, hoveredIndex]);
+
   const handleLoadMore = () => {
     if (status === "loading" || !pageKey || isAllMode) {
       return;
@@ -283,6 +308,7 @@ export default function TokenIndexPanel() {
       ? `Loaded ${tokens.length} tokens. More pages available.`
       : `Loaded ${tokens.length} tokens. End of list.`;
   }, [status, isAllMode, truncated, pages, tokens.length, hasMore]);
+  const highlightIndex = hoveredIndex ?? activeIndex;
 
   return (
     <section className="provenance-panel token-index-panel">
@@ -353,7 +379,7 @@ export default function TokenIndexPanel() {
       {error && <p className="token-index-error">Error: {error}</p>}
 
       <div className="token-index-carousel">
-        {tokens.map((token) => {
+        {tokens.map((token, index) => {
           const shortTokenId = truncateMiddle(token.tokenId);
           const displayTitleRaw =
             token.title ?? token.name ?? `Token ${token.tokenId}`;
@@ -361,8 +387,14 @@ export default function TokenIndexPanel() {
             ? displayTitleRaw.replace(token.tokenId, shortTokenId)
             : displayTitleRaw;
           const imageCandidates = getTokenImageCandidates(token);
+          const isHighlighted = index === highlightIndex;
           return (
-            <article key={token.tokenId} className="token-index-card">
+            <article
+              key={token.tokenId}
+              className={`token-index-card${isHighlighted ? " is-highlighted" : ""}`}
+              onMouseEnter={() => setHoveredIndex(index)}
+              onMouseLeave={() => setHoveredIndex(null)}
+            >
               <div className="token-index-media">
                 <FallbackImage
                   candidates={imageCandidates}

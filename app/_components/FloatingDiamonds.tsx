@@ -108,7 +108,10 @@ export default function FloatingDiamonds() {
           className="floating-tile"
           href={studybookUrl}
           aria-label="Open Studybook"
-          style={{ backgroundColor: TILE_COLORS[index] }}
+          style={{
+            backgroundColor: TILE_COLORS[index],
+            animationDelay: `${index * 1.2}s`,
+          }}
         />
       ))}
     </>

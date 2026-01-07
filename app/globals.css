@@ -1505,28 +1505,14 @@ a {
   pointer-events: none;
 }
 
-.token-index-card:first-child .token-index-media img {
-  filter: none;
-}
-
-.token-index-card:first-child .token-index-media::after {
-  opacity: 0;
-}
-
-.token-index-carousel:hover .token-index-card:first-child .token-index-media img {
-  filter: grayscale(1) contrast(1.15) brightness(0.72) saturate(0.2);
-}
-
-.token-index-carousel:hover .token-index-card:first-child .token-index-media::after {
-  opacity: 0.8;
-}
-
+.token-index-card.is-highlighted .token-index-media img,
 .token-index-card:hover .token-index-media img,
 .token-index-card:focus-within .token-index-media img {
   filter: none;
   transform: scale(1.02);
 }
 
+.token-index-card.is-highlighted .token-index-media::after,
 .token-index-card:hover .token-index-media::after,
 .token-index-card:focus-within .token-index-media::after {
   opacity: 0;
@@ -1638,6 +1624,10 @@ body.notes-docked {
   display: block;
   cursor: pointer;
   transition: filter 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+  opacity: 0.75;
+  animation: floating-shape 8s linear infinite;
+  clip-path: polygon(50% 0%, 100% 0%, 100% 50%, 100% 100%, 50% 100%, 0% 100%, 0% 50%, 0% 0%);
+  -webkit-clip-path: polygon(50% 0%, 100% 0%, 100% 50%, 100% 100%, 50% 100%, 0% 100%, 0% 50%, 0% 0%);
 }
 
 .floating-tile:hover,
@@ -1647,6 +1637,27 @@ body.notes-docked {
     0 0 26px rgba(230, 236, 255, 0.85),
     0 0 42px rgba(220, 230, 255, 0.65),
     inset 0 0 18px rgba(255, 255, 255, 0.45);
+}
+
+@keyframes floating-shape {
+  0% {
+    clip-path: polygon(50% 0%, 100% 0%, 100% 50%, 100% 100%, 50% 100%, 0% 100%, 0% 50%, 0% 0%);
+  }
+  20% {
+    clip-path: polygon(50% 0%, 90% 10%, 100% 50%, 90% 90%, 50% 100%, 10% 90%, 0% 50%, 10% 10%);
+  }
+  40% {
+    clip-path: polygon(50% 0%, 75% 25%, 100% 50%, 75% 75%, 50% 100%, 25% 75%, 0% 50%, 25% 25%);
+  }
+  60% {
+    clip-path: polygon(50% 0%, 50% 0%, 100% 100%, 100% 100%, 50% 100%, 0% 100%, 0% 100%, 50% 0%);
+  }
+  80% {
+    clip-path: polygon(50% 5%, 85% 15%, 100% 50%, 85% 85%, 50% 95%, 15% 85%, 0% 50%, 15% 15%);
+  }
+  100% {
+    clip-path: polygon(50% 0%, 100% 0%, 100% 50%, 100% 100%, 50% 100%, 0% 100%, 0% 50%, 0% 0%);
+  }
 }
 
 .token-index-card-head {
