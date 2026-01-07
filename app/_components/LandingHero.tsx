@@ -5,6 +5,7 @@ import Link from "next/link";
 import LandingSketch from "./LandingSketch";
 import CubixlesLogo from "./CubixlesLogo";
 import type { FaceDefinition } from "../_data/landing-provenance";
+import { withBasePath } from "../_lib/basePath";
 
 type LandingHeroProps = {
   onFaceChange: (faceId: FaceDefinition["id"]) => void;
@@ -34,10 +35,10 @@ export default function LandingHero({ onFaceChange }: LandingHeroProps) {
           displays them as faces while sealing their full provenance in metadata.
         </p>
         <div className="landing-ctas">
-          <Link href="/" className="landing-button primary">
+          <Link href={withBasePath("/")} className="landing-button primary">
             Enter the Mini App
           </Link>
-          <Link href="/m/1" className="landing-button secondary">
+          <Link href={withBasePath("/m/1")} className="landing-button secondary">
             View Example Token
           </Link>
           <Link

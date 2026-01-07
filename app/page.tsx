@@ -1,4 +1,5 @@
 import LandingExperience from "./landing/LandingExperience";
+import { withBasePath } from "./_lib/basePath";
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 const basePath =
@@ -15,10 +16,10 @@ export const metadata = {
     title: "cubixles_ — Provenance as building blocks",
     description:
       "Provenance as building blocks, NFTs as materials, and citations as structure.",
-    url: basePath || "/",
+    url: withBasePath("/"),
     images: [
       {
-        url: "/ogImage.png",
+        url: withBasePath("/ogImage.png"),
         width: 1200,
         height: 630,
       },
@@ -29,7 +30,7 @@ export const metadata = {
     title: "cubixles_ — Provenance as building blocks",
     description:
       "Provenance as building blocks, NFTs as materials, and citations as structure.",
-    images: ["/ogImage.png"],
+    images: [withBasePath("/ogImage.png")],
   },
 };
 

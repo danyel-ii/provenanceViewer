@@ -5,6 +5,7 @@ import CollapsiblePanel from "../../_components/CollapsiblePanel";
 import CubixlesText from "../../_components/CubixlesText";
 import FallbackImage from "../../_components/FallbackImage";
 import TokenVerifyPanel from "../../_components/TokenVerifyPanel";
+import { withBasePath } from "../../_lib/basePath";
 import { resolveMetadataFromObject } from "../../_lib/metadata";
 
 type TokenMetadata = {
@@ -480,7 +481,7 @@ export default async function TokenPage({ params }: { params: { id: string } }) 
             Unable to load token metadata. Please verify the token id.
           </p>
           <div className="landing-ctas">
-            <Link href="/landing" className="landing-button secondary">
+            <Link href={withBasePath("/landing")} className="landing-button secondary">
               Return to provenance cube
             </Link>
           </div>
@@ -515,7 +516,7 @@ export default async function TokenPage({ params }: { params: { id: string } }) 
         titleAs="h1"
         collapsible={false}
         actions={
-          <Link href="/landing" className="landing-button secondary">
+          <Link href={withBasePath("/landing")} className="landing-button secondary">
             Return to provenance cube
           </Link>
         }
