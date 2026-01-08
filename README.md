@@ -17,9 +17,9 @@ If you hit npm cache permission issues, use `npm install --cache .npm-cache`.
 
 Copy `.env.example` to `.env.local` and fill in values:
 - `ALCHEMY_KEY` (or `ALCHEMY_API_KEY`)
-- `CUBIXLES_CONTRACT` (or `CUBIXLES_CONTRACT_ADDRESS`)
+- `CUBIXLES_CONTRACT` (or `CUBIXLES_CONTRACT_ADDRESS`) — mainnet: `0x61EdB3bff9c758215Bc8C0B2eAcf2a56c638a6f2`
 - `NETWORK` (or `CUBIXLES_CHAIN_ID`/`BASE_CHAIN_ID` for auto-mapping)
-- Optional placeholder: `CUBIXLES_BASE_CONTRACT_ADDRESS` (not used yet)
+- Optional: `CUBIXLES_BASE_CONTRACT_ADDRESS` — Base: `0x428032392237cb3BA908a6743994380DCFE7Bb74` (not used yet)
 - `NEXT_PUBLIC_BASE_PATH` (default `/inspecta_deck` for subpath deployments)
 - `NEXT_PUBLIC_BASE_URL` (optional absolute URL for server-side metadata/linking)
 
