@@ -5,6 +5,40 @@ import { useEffect } from "react";
 const FLOCK_DELAY_MS = 900;
 const MOVE_DURATION_MS = 1800;
 const FLOCK_STORAGE_KEY = "cubixles_notes_flock_v1";
+const DEFAULT_NAV_TYPE = "navigate";
+
+type FlockStorage = {
+  v: number;
+  orientation?: string;
+  lastRun?: number;
+};
+
+const getNavigationType = () => {
+  if (typeof performance === "undefined") {
+    return DEFAULT_NAV_TYPE;
+  }
+  const entries = performance.getEntriesByType?.("navigation");
+  const navEntry = entries?.[0] as PerformanceNavigationTiming | undefined;
+  if (navEntry?.type) {
+    return navEntry.type;
+  }
+  const legacyNav = (performance as Performance & { navigation?: { type: number } })
+    .navigation;
+  if (legacyNav?.type === 1) {
+    return "reload";
+  }
+  return DEFAULT_NAV_TYPE;
+};
+
+const getOrientationKey = () => {
+  const orientation = window.screen?.orientation?.type;
+  if (orientation) {
+    return orientation;
+  }
+  const { innerWidth, innerHeight } = window;
+  const ratio = innerHeight ? innerWidth / innerHeight : 0;
+  return `ratio-${ratio.toFixed(2)}`;
+};
 
 export default function NotesFlockAnimator() {
   useEffect(() => {
@@ -16,14 +50,46 @@ export default function NotesFlockAnimator() {
     let timeoutRef: number | null = null;
     let dockTimeoutRef: number | null = null;
     let animationFrameRef: number | null = null;
+    let lastRun = 0;
 
     try {
-      if (window.localStorage.getItem(FLOCK_STORAGE_KEY) === "1") {
+      const storedRaw = window.localStorage.getItem(FLOCK_STORAGE_KEY);
+      let stored: FlockStorage | null = null;
+      if (storedRaw) {
+        try {
+          stored = JSON.parse(storedRaw) as FlockStorage;
+        } catch {
+          stored = { v: 1 };
+        }
+      }
+
+      const navigationType = getNavigationType();
+      const orientationKey = getOrientationKey();
+      const orientationMatches = stored?.orientation
+        ? stored.orientation === orientationKey
+        : true;
+      const shouldRun =
+        !stored || (navigationType === "reload" && orientationMatches);
+
+      if (!shouldRun) {
         overlay.classList.add("dock");
         document.body.classList.add("notes-docked");
+        window.localStorage.setItem(
+          FLOCK_STORAGE_KEY,
+          JSON.stringify({
+            v: 2,
+            orientation: orientationKey,
+            lastRun: stored?.lastRun ?? 0,
+          })
+        );
         return;
       }
-      window.localStorage.setItem(FLOCK_STORAGE_KEY, "1");
+
+      lastRun = Date.now();
+      window.localStorage.setItem(
+        FLOCK_STORAGE_KEY,
+        JSON.stringify({ v: 2, orientation: orientationKey, lastRun })
+      );
     } catch {
       // Ignore storage access errors (private mode, blocked storage).
     }
