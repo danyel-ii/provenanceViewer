@@ -28,3 +28,10 @@
 
 ## Base placeholder
 - Include `CUBIXLES_BASE_CONTRACT_ADDRESS` in `.env.example` as a placeholder; not used in runtime yet.
+
+## Base path enforcement
+- Default the viewer to `/inspecta_deck` even if `NEXT_PUBLIC_BASE_PATH` is unset or `/`, to keep subpath hosting consistent.
+
+## Base path
+- App is configured with `NEXT_PUBLIC_BASE_PATH` (default `/inspecta_deck`) and `assetPrefix` to support subpath hosting.
+- Use `withBasePath(...)` for internal links/assets; metadata uses `NEXT_PUBLIC_BASE_URL` when provided.

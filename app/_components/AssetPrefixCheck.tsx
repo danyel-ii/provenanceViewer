@@ -2,7 +2,9 @@
 
 import { useEffect } from "react";
 
-const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "/inspecta_deck";
+import { getBasePath } from "../_lib/basePath";
+
+const BASE_PATH = getBasePath();
 
 type NextData = {
   assetPrefix?: string;

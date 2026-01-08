@@ -1,7 +1,10 @@
 /** @type {import('next').NextConfig} */
-const rawBasePath = process.env.NEXT_PUBLIC_BASE_PATH || "/inspecta_deck";
+const defaultBasePath = "/inspecta_deck";
+const rawBasePath = process.env.NEXT_PUBLIC_BASE_PATH || defaultBasePath;
 const basePath =
-  rawBasePath && rawBasePath !== "/" ? rawBasePath.replace(/\/$/, "") : "";
+  rawBasePath && rawBasePath !== "/"
+    ? rawBasePath.replace(/\/$/, "")
+    : defaultBasePath;
 
 const nextConfig = {
   reactStrictMode: true,

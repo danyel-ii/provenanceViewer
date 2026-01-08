@@ -5,7 +5,7 @@ import CollapsiblePanel from "../../_components/CollapsiblePanel";
 import CubixlesText from "../../_components/CubixlesText";
 import FallbackImage from "../../_components/FallbackImage";
 import TokenVerifyPanel from "../../_components/TokenVerifyPanel";
-import { withBasePath } from "../../_lib/basePath";
+import { getBasePath, withBasePath } from "../../_lib/basePath";
 import { resolveMetadataFromObject } from "../../_lib/metadata";
 
 type TokenMetadata = {
@@ -85,9 +85,7 @@ type TokenReferenceFace = {
 
 function getBaseUrl() {
   const envUrl = process.env.NEXT_PUBLIC_BASE_URL;
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "/inspecta_deck";
-  const normalizedBasePath =
-    basePath && basePath !== "/" ? basePath.replace(/\/$/, "") : "";
+  const normalizedBasePath = getBasePath();
   if (envUrl) {
     return envUrl.endsWith(normalizedBasePath)
       ? envUrl

@@ -34,12 +34,11 @@ Implement an AI helpdesk for **cubixles_** that is:
 **Docs (preferred)**
 - `docs/**` including:
   - `docs/PHILOSOPHY/**` (canon, glossary, tone)
-  - `docs/30-SECURITY/**` (threat model, invariants, runbook, audit)
-  - `SPEC.md`, `STATE_OF_REVIEW.md`, `RELEASE.md`, `FORK_TESTING.md`
+  - `docs/integration.md`, `docs/decisions.md`
+  - If added later: `docs/30-SECURITY/**`, `SPEC.md`, `STATE_OF_REVIEW.md`, `RELEASE.md`, `FORK_TESTING.md`
 **Code (limited)**
-- `app/**` (API routes + token viewer + metadata builder)
-- `contracts/src/**` (IceCubeMinter, RoyaltySplitter, interfaces)
-- `contracts/test/**` (selected tests; only for explaining behavior)
+- `app/**` (API routes + token viewer + metadata builder + helpdesk UI)
+- `contracts/src/**` and `contracts/test/**` (if present)
 
 **Explicit denylist**
 - `.env*`, `**/secrets*`, `**/credentials*`, `node_modules/**`, `.next/**`, `out/**`, `dist/**`
@@ -91,11 +90,7 @@ Implement an AI helpdesk for **cubixles_** that is:
   - log only request id + duration + status + hashed ip
 
 ## Acceptance tests
-- “Rabby shows blank NFT”: answer must cite metadata field requirements.
-- “Why preview not available on Warpcast”: answer must cite fc:miniapp tags requirement.
-- “Why fork tests skipped”: answer must cite MAINNET_RPC_URL requirement.
-- “How to create accountAssociation”: must cite manifest tool steps.
-- “How tokenId is derived”: must cite `previewTokenId` code or spec.
+Use `tests/helpdesk_eval.json` as the current acceptance list; answers should cite those sources.
+Legacy examples (keep Unverified if not in KB): Rabby preview, Warpcast tags, fork testing, accountAssociation.
 
 ---
-

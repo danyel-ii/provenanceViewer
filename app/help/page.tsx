@@ -1,11 +1,9 @@
 import CubixlesLogo from "../_components/CubixlesLogo";
 import HelpdeskClient from "./HelpdeskClient";
+import { getBasePath } from "../_lib/basePath";
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-const basePath =
-  process.env.NEXT_PUBLIC_BASE_PATH && process.env.NEXT_PUBLIC_BASE_PATH !== "/"
-    ? process.env.NEXT_PUBLIC_BASE_PATH.replace(/\/$/, "")
-    : "";
+const basePath = getBasePath();
 
 export const metadata = {
   title: "cubixles_ helpdesk",

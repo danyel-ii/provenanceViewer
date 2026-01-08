@@ -20,6 +20,8 @@ Copy `.env.example` to `.env.local` and fill in values:
 - `CUBIXLES_CONTRACT` (or `CUBIXLES_CONTRACT_ADDRESS`)
 - `NETWORK` (or `CUBIXLES_CHAIN_ID`/`BASE_CHAIN_ID` for auto-mapping)
 - Optional placeholder: `CUBIXLES_BASE_CONTRACT_ADDRESS` (not used yet)
+- `NEXT_PUBLIC_BASE_PATH` (default `/inspecta_deck` for subpath deployments)
+- `NEXT_PUBLIC_BASE_URL` (optional absolute URL for server-side metadata/linking)
 
 Optional caching and rate limits:
 - `CACHE_PROVIDER` (`memory`, `redis`, `kv`)
@@ -27,6 +29,11 @@ Optional caching and rate limits:
 - `CACHE_TTL_*`
 - `VERIFY_RATE_LIMIT`, `VERIFY_RATE_WINDOW_SECONDS`
 - `KV_REST_API_URL`, `KV_REST_API_TOKEN`, `KV_REST_API_READ_ONLY_TOKEN`
+- `HELPDESK_RATE_LIMIT`, `HELPDESK_RATE_WINDOW_SECONDS`
+
+Optional mint audit enrichment:
+- `ALCHEMY_API_KEY` (used by `/m/[tokenId]` metadata lookups)
+- `MAINNET_RPC_URL` + `CUBIXLES_CONTRACT_ADDRESS` (enables `alchemy_getAssetTransfers`)
 
 ## API endpoints
 - `GET /api/poc/tokens?limit=&pageKey=&all=true&maxPages=`
@@ -38,10 +45,19 @@ Optional caching and rate limits:
   - Heuristic provenance candidates with confidence + evidence.
 - `POST /api/token/:id/verify`
   - Read-only verification (ownerOf + tokenURI). Rate limited.
+- `POST /api/help`
+  - RAG helpdesk endpoint (returns answer + citations).
 
-## Frontend
+## Frontend routes
+All routes are served under `NEXT_PUBLIC_BASE_PATH` when configured (default `/inspecta_deck`).
+- `GET /` or `GET /landing`
+  - Landing page + live token list.
 - `GET /token/[id]`
   - Token viewer that renders metadata, provenance candidates, and verification UI.
+- `GET /m/[tokenId]`
+  - Mint audit view (uses optional enrichment if configured).
+- `GET /help`
+  - Helpdesk UI with citations.
 
 ## Limits and assumptions
 - Provenance is heuristic and can be incomplete.

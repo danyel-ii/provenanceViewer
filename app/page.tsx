@@ -1,11 +1,8 @@
 import LandingExperience from "./landing/LandingExperience";
-import { withBasePath } from "./_lib/basePath";
+import { getBasePath, withBasePath } from "./_lib/basePath";
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-const basePath =
-  process.env.NEXT_PUBLIC_BASE_PATH && process.env.NEXT_PUBLIC_BASE_PATH !== "/"
-    ? process.env.NEXT_PUBLIC_BASE_PATH.replace(/\/$/, "")
-    : "";
+const basePath = getBasePath();
 
 export const metadata = {
   title: "cubixles_ — Provenance as building blocks",
