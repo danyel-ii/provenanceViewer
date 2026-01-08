@@ -32,6 +32,9 @@
 ## Base path enforcement
 - Default the viewer to `/inspecta_deck` even if `NEXT_PUBLIC_BASE_PATH` is unset or `/`, to keep subpath hosting consistent.
 
+## CSP middleware
+- TODO.md is not present; proceeding with nonce-based CSP middleware per user request.
+
 ## Base path
 - App is configured with `NEXT_PUBLIC_BASE_PATH` (default `/inspecta_deck`) and `assetPrefix` to support subpath hosting.
 - Use `withBasePath(...)` for internal links/assets; metadata uses `NEXT_PUBLIC_BASE_URL` when provided.
