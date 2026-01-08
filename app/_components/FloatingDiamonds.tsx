@@ -11,7 +11,12 @@ type DiamondState = {
   vRotation: number;
 };
 
-const CUBE_COUNT = 3;
+const CUBE_LINKS = [
+  { href: "https://nodefoundation.com/", label: "Open Node Foundation" },
+  { href: "https://less.ripe.wtf/", label: "Open less.ripe.wtf" },
+  { href: "https://studybook.eth.link", label: "Open Studybook" },
+];
+const CUBE_COUNT = CUBE_LINKS.length;
 const CUBE_SIZE = 36;
 const RUBIK_FACES = [
   [
@@ -129,31 +134,32 @@ export default function FloatingDiamonds() {
     };
   }, []);
 
-  const studybookUrl = "https://studybook.eth.link";
-
   return (
     <>
       {Array.from({ length: CUBE_COUNT }).map((_, index) => {
         const colors = RUBIK_FACES[index % RUBIK_FACES.length];
+        const link = CUBE_LINKS[index % CUBE_LINKS.length];
         return (
-        <a
-          key={`cube-${index}`}
-          ref={(node) => {
-            anchorsRef.current[index] = node;
-          }}
-          className="floating-tile"
-          href={studybookUrl}
-          aria-label="Open Studybook"
-        >
-          {colors.map((color, tileIndex) => (
-            <span
-              key={`cubelet-${index}-${tileIndex}`}
-              className="floating-cubelet"
-              style={{ backgroundColor: color }}
-            />
-          ))}
-        </a>
-      );
+          <a
+            key={`cube-${index}`}
+            ref={(node) => {
+              anchorsRef.current[index] = node;
+            }}
+            className="floating-tile"
+            href={link.href}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <span className="sr-only">{link.label}</span>
+            {colors.map((color, tileIndex) => (
+              <span
+                key={`cubelet-${index}-${tileIndex}`}
+                className="floating-cubelet"
+                style={{ backgroundColor: color }}
+              />
+            ))}
+          </a>
+        );
       })}
     </>
   );
