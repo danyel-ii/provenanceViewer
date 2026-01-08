@@ -1543,7 +1543,7 @@ a {
   z-index: 0;
   transform: translate3d(-50%, -50%, 0) rotate(var(--rotation));
   transition:
-    transform 1.8s cubic-bezier(0.4, 0, 1, 1),
+    transform 1.8s cubic-bezier(0.2, 0, 1, 1),
     opacity 1.3s ease-in;
   transition-delay: var(--delay);
   will-change: transform, opacity;
