@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { PALETTE_COLORS } from "../_data/paletteColors";
+import { CUBIXLES_LOGO_GLYPH } from "../_lib/logo";
 import NotesFlockAnimator from "./NotesFlockAnimator";
 
 type NoteTile = {
@@ -64,7 +65,7 @@ const NOTE_TILES: NoteTile[] = Array.from({ length: TILE_COUNT }).map(
   }
 );
 
-const LOGO_GLYPHS = Array.from("cubixles_");
+const LOGO_GLYPHS = [CUBIXLES_LOGO_GLYPH];
 const LOGO_LETTERS = LOGO_GLYPHS.map((glyph, index) => {
   const rand = seededRandom(900 + index);
   return {
