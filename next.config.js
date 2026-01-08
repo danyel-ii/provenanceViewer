@@ -10,7 +10,7 @@ const nextConfig = {
   reactStrictMode: true,
   basePath,
   assetPrefix: basePath,
-  trailingSlash: true,
+  trailingSlash: false,
   experimental: {
     serverComponentsExternalPackages: ["@xenova/transformers", "onnxruntime-node"],
   },

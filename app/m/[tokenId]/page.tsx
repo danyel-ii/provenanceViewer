@@ -9,6 +9,8 @@ import { MINT_AUDIT } from "../../_data/mint-audit";
 
 const fallbackCube = CUBIXLES_MINTED_CUBES[MINT_AUDIT.tokenId];
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({
   params,
 }: {

@@ -15,7 +15,14 @@ function createNonce() {
   return btoa(binary);
 }
 
-function buildCsp({ nonce, frameAncestors, isProd, reportUri, reportTo }) {
+function buildCsp({
+  nonce,
+  frameAncestors,
+  isProd,
+  reportUri,
+  reportTo,
+  includeUpgradeInsecureRequests = true,
+}) {
   const scriptSrc = [
     "'self'",
     `'nonce-${nonce}'`,
@@ -41,8 +48,11 @@ function buildCsp({ nonce, frameAncestors, isProd, reportUri, reportTo }) {
     "img-src 'self' data: blob: https:",
     "font-src 'self' data: https://fonts.gstatic.com https:",
     "connect-src 'self' https: wss:",
-    "upgrade-insecure-requests",
   ];
+
+  if (includeUpgradeInsecureRequests) {
+    directives.push("upgrade-insecure-requests");
+  }
 
   if (reportTo) {
     directives.push(`report-to ${reportTo}`);
@@ -78,6 +88,7 @@ export function middleware(request) {
     isProd: process.env.NODE_ENV === "production",
     reportUri,
     reportTo: CSP_REPORT_GROUP,
+    includeUpgradeInsecureRequests: false,
   });
 
   const requestHeaders = new Headers(request.headers);

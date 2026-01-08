@@ -34,6 +34,8 @@
 
 ## CSP middleware
 - TODO.md is not present; proceeding with nonce-based CSP middleware per user request.
+- Viewer pages are forced dynamic so Next can attach CSP nonces to inline scripts per request.
+- `/api/csp-report` accepts CSP telemetry, enforces size/type checks, rate limits per client, strips query/hash from URLs, and returns 204.
 
 ## Base path
 - App is configured with `NEXT_PUBLIC_BASE_PATH` (default `/inspecta_deck`) and `assetPrefix` to support subpath hosting.

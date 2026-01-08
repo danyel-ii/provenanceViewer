@@ -3,6 +3,8 @@ import AssetPrefixCheck from "./_components/AssetPrefixCheck";
 import FloatingDiamonds from "./_components/FloatingDiamonds";
 import { cubixlesLogoFont } from "./_lib/fonts";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "cubixles_ — Provenance as Composition",
   description:

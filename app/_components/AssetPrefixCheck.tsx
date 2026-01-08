@@ -17,8 +17,8 @@ function getNextData(): NextData | undefined {
 export default function AssetPrefixCheck() {
   useEffect(() => {
     const basePath = BASE_PATH && BASE_PATH !== "/" ? BASE_PATH.replace(/\/$/, "") : "";
-    const assetPrefix = getNextData()?.assetPrefix ?? "";
-    if (basePath && !assetPrefix.startsWith(basePath)) {
+    const assetPrefix = getNextData()?.assetPrefix;
+    if (assetPrefix && basePath && !assetPrefix.startsWith(basePath)) {
       console.warn(
         "[inspecta] assetPrefix mismatch:",
         { basePath, assetPrefix }

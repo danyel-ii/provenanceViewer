@@ -8,6 +8,8 @@ import TokenVerifyPanel from "../../_components/TokenVerifyPanel";
 import { getBasePath, withBasePath } from "../../_lib/basePath";
 import { resolveMetadataFromObject } from "../../_lib/metadata";
 
+export const dynamic = "force-dynamic";
+
 type TokenMetadata = {
   raw: Record<string, unknown> | null;
   resolved: Record<string, unknown> | null;

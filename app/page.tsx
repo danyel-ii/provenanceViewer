@@ -4,6 +4,8 @@ import { getBasePath, withBasePath } from "./_lib/basePath";
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 const basePath = getBasePath();
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "cubixles_ — Provenance as building blocks",
   description:
