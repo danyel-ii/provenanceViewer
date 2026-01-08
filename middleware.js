@@ -4,6 +4,12 @@ const DEFAULT_FRAME_ANCESTORS =
   "'self' https://warpcast.com https://*.warpcast.com https://farcaster.xyz https://*.farcaster.xyz";
 const CSP_REPORT_GROUP = "csp-endpoint";
 const CSP_REPORT_MAX_AGE = 10886400;
+const DEFAULT_BASE_PATH = "/inspecta_deck";
+const RAW_BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || DEFAULT_BASE_PATH;
+const BASE_PATH =
+  RAW_BASE_PATH && RAW_BASE_PATH !== "/"
+    ? RAW_BASE_PATH.replace(/\/$/, "")
+    : DEFAULT_BASE_PATH;
 
 function createNonce() {
   const bytes = new Uint8Array(16);
@@ -75,7 +81,7 @@ function buildReportTo(url) {
 export function middleware(request) {
   const nonce = createNonce();
   const frameAncestors = process.env.FRAME_ANCESTORS || DEFAULT_FRAME_ANCESTORS;
-  const reportUri = "/api/csp-report";
+  const reportUri = `${BASE_PATH}/api/csp-report`;
   const reportUrl = new URL(reportUri, request.nextUrl.origin).toString();
   const csp = buildCsp({
     nonce,

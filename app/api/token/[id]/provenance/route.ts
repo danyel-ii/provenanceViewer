@@ -4,6 +4,8 @@ import { getCachedJson } from "../../../../_lib/cache";
 import { getEnvConfig } from "../../../../_lib/env";
 import { getNftMetadata, getOwnersForToken } from "../../../../_lib/alchemy";
 import { normalizeTokenId } from "../../../../_lib/normalize";
+import { getTrustedClientIp } from "../../../../_lib/request";
+import { checkTokenBucket, getReadRateLimitConfig } from "../../../../_lib/rateLimit";
 import {
   resolveMetadata,
   resolveMetadataFromObject,
@@ -25,6 +27,23 @@ export async function GET(
   const tokenId = normalizeTokenId(params.id);
   if (!tokenId) {
     return NextResponse.json({ error: "invalid_token_id" }, { status: 400 });
+  }
+
+  const { limit: readLimit, windowMs } = getReadRateLimitConfig();
+  const clientKey = `read:${new URL(request.url).pathname}:${getTrustedClientIp(
+    request
+  )}`;
+  const rate = await checkTokenBucket(clientKey, readLimit, windowMs);
+  if (!rate.allowed) {
+    return NextResponse.json(
+      { error: "rate_limited", resetAt: rate.resetAt },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": Math.ceil((rate.resetAt - Date.now()) / 1000).toString(),
+        },
+      }
+    );
   }
 
   const { contractAddress, network, cacheTtls } = getEnvConfig();

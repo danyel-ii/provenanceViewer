@@ -227,6 +227,18 @@ function filterAllowedUrls(urls: string[]): string[] {
   return allowed;
 }
 
+function isAllowedUrl(raw: string): boolean {
+  try {
+    const url = new URL(raw);
+    if (url.protocol !== "http:" && url.protocol !== "https:") {
+      return false;
+    }
+    return isAllowedHost(url.hostname) && !isPrivateHost(url.hostname);
+  } catch {
+    return false;
+  }
+}
+
 function buildGatewayUrls(rawUrl: string): string[] {
   const trimmed = rawUrl.trim();
   if (!trimmed) {
@@ -329,6 +341,9 @@ async function fetchJsonWithFallback(urls: string[]): Promise<{
         signal: controller.signal,
       });
       if (!response.ok) {
+        continue;
+      }
+      if (!isAllowedUrl(response.url)) {
         continue;
       }
       const json = await readJsonWithLimit(response, METADATA_MAX_BYTES);

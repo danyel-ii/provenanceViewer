@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 
 import { getEnvConfig } from "../../../_lib/env";
+import { getTrustedClientIp } from "../../../_lib/request";
+import { checkTokenBucket, getReadRateLimitConfig } from "../../../_lib/rateLimit";
 import {
   getAllNftsForCollection,
   getNftsForCollection,
@@ -10,6 +12,23 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
   try {
+    const { limit: readLimit, windowMs } = getReadRateLimitConfig();
+    const clientKey = `read:${new URL(request.url).pathname}:${getTrustedClientIp(
+      request
+    )}`;
+    const rate = await checkTokenBucket(clientKey, readLimit, windowMs);
+    if (!rate.allowed) {
+      return NextResponse.json(
+        { error: "rate_limited", resetAt: rate.resetAt },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": Math.ceil((rate.resetAt - Date.now()) / 1000).toString(),
+          },
+        }
+      );
+    }
+
     const { network, contractAddress } = getEnvConfig();
     const { searchParams } = new URL(request.url);
     const limitParam = searchParams.get("limit");

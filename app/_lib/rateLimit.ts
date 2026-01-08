@@ -194,6 +194,15 @@ export function getVerifyRateLimitConfig() {
   };
 }
 
+export function getReadRateLimitConfig() {
+  const limit = parseNumberEnv("READ_RATE_LIMIT", 120);
+  const windowSeconds = parseNumberEnv("READ_RATE_WINDOW_SECONDS", 60);
+  return {
+    limit: Number.isFinite(limit) ? limit : 120,
+    windowMs: (Number.isFinite(windowSeconds) ? windowSeconds : 60) * 1000,
+  };
+}
+
 export function getHelpdeskRateLimitConfig() {
   const limit = parseNumberEnv("HELPDESK_RATE_LIMIT", 10);
   const windowSeconds = parseNumberEnv("HELPDESK_RATE_WINDOW_SECONDS", 60);

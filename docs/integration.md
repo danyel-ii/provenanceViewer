@@ -3,9 +3,10 @@
 This app uses the Alchemy NFT REST API for collection and metadata lookups, and the Alchemy RPC endpoint (via ethers.js) for read-only transaction and contract calls.
 
 ## Base URLs
-- NFT API (v3): `https://{NETWORK}.g.alchemy.com/nft/v3/{ALCHEMY_KEY}`
+- NFT API (v3): `https://{NETWORK}.g.alchemy.com/nft/v3/{ALCHEMY_KEY_OR_API_KEY}`
 - NFT API (mint audit, v2): `https://{NETWORK}.g.alchemy.com/nft/v2/{ALCHEMY_API_KEY}`
-- RPC: `https://{NETWORK}.g.alchemy.com/v2/{ALCHEMY_KEY}`
+- RPC: `https://{NETWORK}.g.alchemy.com/v2/{ALCHEMY_KEY_OR_API_KEY}`
+Note: v3 + RPC use whichever of `ALCHEMY_KEY` or `ALCHEMY_API_KEY` is set first.
 
 ## Network resolution
 - Primary: `NETWORK`.

@@ -21,20 +21,23 @@ Copy `.env.example` to `.env.local` and fill in values:
 - `NETWORK` (or `CUBIXLES_CHAIN_ID`/`BASE_CHAIN_ID` for auto-mapping)
 - Optional: `CUBIXLES_BASE_CONTRACT_ADDRESS` (Base: `0x428032392237cb3BA908a6743994380DCFE7Bb74`, not used yet)
 - `NEXT_PUBLIC_BASE_PATH` (default `/inspecta_deck` for subpath deployments)
-- `NEXT_PUBLIC_BASE_URL` (optional absolute URL for server-side metadata/linking)
+- `NEXT_PUBLIC_BASE_URL` (optional absolute URL for metadata/linking; include the base path if hosting under a subpath, e.g. `https://www.cubixles.xyz/inspecta_deck`)
 
 Optional caching and rate limits:
 - `CACHE_PROVIDER` (`memory`, `redis`, `kv`)
 - `REDIS_URL`
 - `CACHE_TTL_*`
+- `READ_RATE_LIMIT`, `READ_RATE_WINDOW_SECONDS`
 - `VERIFY_RATE_LIMIT`, `VERIFY_RATE_WINDOW_SECONDS`
-- `KV_REST_API_URL`, `KV_REST_API_TOKEN`, `KV_REST_API_READ_ONLY_TOKEN`
+- `KV_REST_API_URL`, `KV_REST_API_TOKEN`
 - `HELPDESK_RATE_LIMIT`, `HELPDESK_RATE_WINDOW_SECONDS`
+- Distributed rate limiting uses `REDIS_URL` first, then Vercel KV when `KV_REST_API_URL` + `KV_REST_API_TOKEN` are set (otherwise falls back to in-memory).
 
 Optional metadata fetch safety:
 - `METADATA_ALLOWED_HOSTS` (comma/space-delimited allowlist)
 - `METADATA_FETCH_TIMEOUT_MS`
 - `METADATA_MAX_BYTES`
+- Defaults to IPFS/Arweave gateways and blocks private/loopback hosts.
 
 Optional CSP and framing:
 - `FRAME_ANCESTORS` (space-delimited origins for `frame-ancestors`)
@@ -86,6 +89,7 @@ All routes are served under `NEXT_PUBLIC_BASE_PATH` when configured (default `/i
 - Only tokens from `CUBIXLES_CONTRACT` are valid.
 - No wallet connections, signing, or on-chain writes are permitted.
 - Metadata is resolved through IPFS/Arweave gateways and cached with TTLs.
+- Public read endpoints are rate limited per client IP (configurable with `READ_RATE_LIMIT`).
 
 ## Signature
 ```
