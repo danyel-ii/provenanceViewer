@@ -5,6 +5,7 @@ import { useEffect } from "react";
 const FLOCK_DELAY_MS = 900;
 const MOVE_DURATION_MS = 1800;
 const OVERLAY_FADE_MS = 520;
+const FADE_START_DELAY_MS = 150;
 const QUICK_FADE_MS = 600;
 const FLOCK_STORAGE_KEY = "cubixles_notes_flock_v1";
 const DEFAULT_NAV_TYPE = "navigate";
@@ -52,6 +53,7 @@ export default function NotesFlockAnimator() {
     let timeoutRef: number | null = null;
     let dockTimeoutRef: number | null = null;
     let animationFrameRef: number | null = null;
+    let fadeTimeoutRef: number | null = null;
     let lastRun = 0;
 
     const setCubeFadeDuration = (durationMs: number) => {
@@ -117,6 +119,9 @@ export default function NotesFlockAnimator() {
       if (animationFrameRef) {
         window.cancelAnimationFrame(animationFrameRef);
       }
+      if (fadeTimeoutRef) {
+        window.clearTimeout(fadeTimeoutRef);
+      }
 
       overlay.classList.remove("flock");
       overlay.classList.remove("dock");
@@ -158,12 +163,15 @@ export default function NotesFlockAnimator() {
         });
 
         const totalDuration = maxDelay + MOVE_DURATION_MS + OVERLAY_FADE_MS;
-        setCubeFadeDuration(totalDuration);
+        setCubeFadeDuration(Math.max(0, totalDuration - FADE_START_DELAY_MS));
 
         timeoutRef = window.setTimeout(
           () => {
             overlay.classList.add("flock");
-            startCubeFade();
+            fadeTimeoutRef = window.setTimeout(
+              () => startCubeFade(),
+              FADE_START_DELAY_MS
+            );
           },
           FLOCK_DELAY_MS
         );
@@ -185,6 +193,9 @@ export default function NotesFlockAnimator() {
       }
       if (animationFrameRef) {
         window.cancelAnimationFrame(animationFrameRef);
+      }
+      if (fadeTimeoutRef) {
+        window.clearTimeout(fadeTimeoutRef);
       }
       document.body.classList.remove("notes-docked");
       document.body.classList.remove("cube-fade-in");
