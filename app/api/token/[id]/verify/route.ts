@@ -3,17 +3,10 @@ import { NextResponse } from "next/server";
 import { getEnvConfig } from "../../../../_lib/env";
 import { normalizeTokenId } from "../../../../_lib/normalize";
 import { readOwnerOf, readTokenUri } from "../../../../_lib/ethers";
+import { getTrustedClientIp } from "../../../../_lib/request";
 import { checkRateLimit, getVerifyRateLimitConfig } from "../../../../_lib/rateLimit";
 
 export const dynamic = "force-dynamic";
-
-function getClientKey(request: Request) {
-  const forwardedFor = request.headers.get("x-forwarded-for");
-  if (forwardedFor) {
-    return forwardedFor.split(",")[0]?.trim() ?? "unknown";
-  }
-  return "unknown";
-}
 
 export async function POST(
   request: Request,
@@ -26,8 +19,8 @@ export async function POST(
 
   const { contractAddress, network } = getEnvConfig();
   const { limit, windowMs } = getVerifyRateLimitConfig();
-  const clientKey = `verify:${getClientKey(request)}`;
-  const rate = checkRateLimit(clientKey, limit, windowMs);
+  const clientKey = `verify:${getTrustedClientIp(request)}`;
+  const rate = await checkRateLimit(clientKey, limit, windowMs);
 
   if (!rate.allowed) {
     return NextResponse.json(

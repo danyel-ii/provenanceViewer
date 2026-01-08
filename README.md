@@ -31,13 +31,20 @@ Optional caching and rate limits:
 - `KV_REST_API_URL`, `KV_REST_API_TOKEN`, `KV_REST_API_READ_ONLY_TOKEN`
 - `HELPDESK_RATE_LIMIT`, `HELPDESK_RATE_WINDOW_SECONDS`
 
+Optional metadata fetch safety:
+- `METADATA_ALLOWED_HOSTS` (comma/space-delimited allowlist)
+- `METADATA_FETCH_TIMEOUT_MS`
+- `METADATA_MAX_BYTES`
+
 Optional CSP and framing:
 - `FRAME_ANCESTORS` (space-delimited origins for `frame-ancestors`)
 - `CSP_REPORT_MAX_BYTES`, `CSP_REPORT_RATE_LIMIT`, `CSP_REPORT_RATE_WINDOW_SECONDS`
 
 Optional helpdesk LLM configuration:
+- `HELPDESK_MAX_BODY_BYTES`
 - `HELPDESK_LLM_API_KEY` (or `OPENAI_API_KEY`)
 - `HELPDESK_LLM_BASE_URL`, `HELPDESK_LLM_MODEL`
+- `HELPDESK_LLM_MAX_TOKENS`
 
 Optional mint audit enrichment:
 - `ALCHEMY_API_KEY` + `CUBIXLES_CONTRACT_ADDRESS` (used by `/m/[tokenId]` metadata lookups)

@@ -4,6 +4,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 
 import { hybridSearch } from "../../_lib/kb";
+import { getTrustedClientIp } from "../../_lib/request";
 import { checkTokenBucket, getHelpdeskRateLimitConfig } from "../../_lib/rateLimit";
 
 export const dynamic = "force-dynamic";
@@ -26,22 +27,44 @@ type ContextChunk = Citation & {
 };
 
 const DEFAULT_TOP_K = 8;
+const DEFAULT_MAX_BODY_BYTES = 16 * 1024;
+const DEFAULT_MAX_TOKENS = 700;
+const MAX_BODY_BYTES = parsePositiveInt(
+  process.env.HELPDESK_MAX_BODY_BYTES,
+  DEFAULT_MAX_BODY_BYTES,
+  1024,
+  256 * 1024
+);
+const MAX_LLM_TOKENS = parsePositiveInt(
+  process.env.HELPDESK_LLM_MAX_TOKENS,
+  DEFAULT_MAX_TOKENS,
+  64,
+  4096
+);
 
 let helpdeskRulesPromise: Promise<string> | null = null;
 
-function getClientKey(request: Request) {
-  const forwardedFor = request.headers.get("x-forwarded-for");
-  if (forwardedFor) {
-    return forwardedFor.split(",")[0]?.trim() ?? "unknown";
+function parsePositiveInt(
+  raw: string | undefined,
+  fallback: number,
+  min: number,
+  max: number
+): number {
+  if (!raw) {
+    return fallback;
   }
-  return "unknown";
+  const parsed = Number.parseInt(raw, 10);
+  if (!Number.isFinite(parsed)) {
+    return fallback;
+  }
+  return Math.min(Math.max(parsed, min), max);
 }
 
 function getHelpdeskConfig() {
   const apiKey = process.env.HELPDESK_LLM_API_KEY ?? process.env.OPENAI_API_KEY ?? "";
   const baseUrl = process.env.HELPDESK_LLM_BASE_URL ?? "https://api.openai.com/v1";
   const model = process.env.HELPDESK_LLM_MODEL ?? "gpt-4o-mini";
-  return { apiKey, baseUrl, model };
+  return { apiKey, baseUrl, model, maxTokens: MAX_LLM_TOKENS };
 }
 
 async function loadHelpdeskRules(): Promise<string> {
@@ -82,7 +105,7 @@ function extractConfidence(answer: string): "high" | "medium" | "low" {
 }
 
 async function callLlm(systemPrompt: string, userPrompt: string): Promise<string> {
-  const { apiKey, baseUrl, model } = getHelpdeskConfig();
+  const { apiKey, baseUrl, model, maxTokens } = getHelpdeskConfig();
   if (!apiKey) {
     throw new Error("missing_llm_api_key");
   }
@@ -96,6 +119,7 @@ async function callLlm(systemPrompt: string, userPrompt: string): Promise<string
     body: JSON.stringify({
       model,
       temperature: 0.2,
+      max_tokens: maxTokens,
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt },
@@ -118,6 +142,53 @@ async function callLlm(systemPrompt: string, userPrompt: string): Promise<string
   return content;
 }
 
+async function readBodyWithLimit(request: Request, maxBytes: number): Promise<string> {
+  const contentLength = request.headers.get("content-length");
+  if (contentLength) {
+    const length = Number.parseInt(contentLength, 10);
+    if (Number.isFinite(length) && length > maxBytes) {
+      throw new Error("body_too_large");
+    }
+  }
+
+  const reader = request.body?.getReader();
+  if (!reader) {
+    const text = await request.text();
+    const bytes = new TextEncoder().encode(text).length;
+    if (bytes > maxBytes) {
+      throw new Error("body_too_large");
+    }
+    return text;
+  }
+
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) {
+      break;
+    }
+    if (!value) {
+      continue;
+    }
+    total += value.length;
+    if (total > maxBytes) {
+      await reader.cancel();
+      throw new Error("body_too_large");
+    }
+    chunks.push(value);
+  }
+
+  const buffer = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    buffer.set(chunk, offset);
+    offset += chunk.length;
+  }
+
+  return new TextDecoder().decode(buffer);
+}
+
 export async function POST(request: Request) {
   const requestId = randomUUID();
   const startedAt = Date.now();
@@ -132,9 +203,17 @@ export async function POST(request: Request) {
     );
   };
 
+  let rawBody = "";
+  try {
+    rawBody = await readBodyWithLimit(request, MAX_BODY_BYTES);
+  } catch {
+    logRequest(413);
+    return NextResponse.json({ error: "body_too_large" }, { status: 413 });
+  }
+
   let body: HelpRequest;
   try {
-    body = (await request.json()) as HelpRequest;
+    body = JSON.parse(rawBody) as HelpRequest;
   } catch {
     logRequest(400);
     return NextResponse.json({ error: "invalid_json" }, { status: 400 });
@@ -150,8 +229,8 @@ export async function POST(request: Request) {
     body.diagnostics && typeof body.diagnostics === "object" ? body.diagnostics : null;
 
   const { limit, windowMs } = getHelpdeskRateLimitConfig();
-  const clientKey = `helpdesk:${getClientKey(request)}`;
-  const rate = checkTokenBucket(clientKey, limit, windowMs);
+  const clientKey = `helpdesk:${getTrustedClientIp(request)}`;
+  const rate = await checkTokenBucket(clientKey, limit, windowMs);
   if (!rate.allowed) {
     logRequest(429);
     return NextResponse.json(

@@ -11,9 +11,43 @@ type DiamondState = {
   vRotation: number;
 };
 
-const DIAMOND_COUNT = 3;
-const DIAMOND_SIZE = 36;
-const TILE_COLORS = ["#050505", "#2f9a3e", "#c4161c"];
+const CUBE_COUNT = 3;
+const CUBE_SIZE = 36;
+const RUBIK_FACES = [
+  [
+    "#f6c933",
+    "#f3f1e7",
+    "#d4362a",
+    "#1a5fd6",
+    "#f6c933",
+    "#1b9c53",
+    "#f28c28",
+    "#f6c933",
+    "#1a5fd6",
+  ],
+  [
+    "#1b9c53",
+    "#f3f1e7",
+    "#1a5fd6",
+    "#f28c28",
+    "#1b9c53",
+    "#d4362a",
+    "#f6c933",
+    "#1b9c53",
+    "#f28c28",
+  ],
+  [
+    "#1a5fd6",
+    "#f6c933",
+    "#f3f1e7",
+    "#d4362a",
+    "#1a5fd6",
+    "#f28c28",
+    "#1b9c53",
+    "#1a5fd6",
+    "#d4362a",
+  ],
+];
 
 function randomBetween(min: number, max: number) {
   return min + Math.random() * (max - min);
@@ -21,8 +55,8 @@ function randomBetween(min: number, max: number) {
 
 function createState(width: number, height: number): DiamondState {
   return {
-    x: randomBetween(0, Math.max(0, width - DIAMOND_SIZE)),
-    y: randomBetween(0, Math.max(0, height - DIAMOND_SIZE)),
+    x: randomBetween(0, Math.max(0, width - CUBE_SIZE)),
+    y: randomBetween(0, Math.max(0, height - CUBE_SIZE)),
     vx: randomBetween(-0.7, 0.7),
     vy: randomBetween(-0.7, 0.7),
     rotation: randomBetween(-12, 12),
@@ -60,17 +94,17 @@ export default function FloatingDiamonds() {
         state.y += state.vy;
         state.rotation += state.vRotation;
 
-        if (state.x > width + DIAMOND_SIZE) {
-          state.x = -DIAMOND_SIZE;
+        if (state.x > width + CUBE_SIZE) {
+          state.x = -CUBE_SIZE;
         }
-        if (state.x < -DIAMOND_SIZE) {
-          state.x = width + DIAMOND_SIZE;
+        if (state.x < -CUBE_SIZE) {
+          state.x = width + CUBE_SIZE;
         }
-        if (state.y > height + DIAMOND_SIZE) {
-          state.y = -DIAMOND_SIZE;
+        if (state.y > height + CUBE_SIZE) {
+          state.y = -CUBE_SIZE;
         }
-        if (state.y < -DIAMOND_SIZE) {
-          state.y = height + DIAMOND_SIZE;
+        if (state.y < -CUBE_SIZE) {
+          state.y = height + CUBE_SIZE;
         }
 
         node.style.transform = `translate3d(${state.x}px, ${state.y}px, 0) rotate(${state.rotation}deg)`;
@@ -99,21 +133,28 @@ export default function FloatingDiamonds() {
 
   return (
     <>
-      {Array.from({ length: DIAMOND_COUNT }).map((_, index) => (
+      {Array.from({ length: CUBE_COUNT }).map((_, index) => {
+        const colors = RUBIK_FACES[index % RUBIK_FACES.length];
+        return (
         <a
-          key={`diamond-${index}`}
+          key={`cube-${index}`}
           ref={(node) => {
             anchorsRef.current[index] = node;
           }}
           className="floating-tile"
           href={studybookUrl}
           aria-label="Open Studybook"
-          style={{
-            backgroundColor: TILE_COLORS[index],
-            animationDelay: `${index * 1.2}s`,
-          }}
-        />
-      ))}
+        >
+          {colors.map((color, tileIndex) => (
+            <span
+              key={`cubelet-${index}-${tileIndex}`}
+              className="floating-cubelet"
+              style={{ backgroundColor: color }}
+            />
+          ))}
+        </a>
+      );
+      })}
     </>
   );
 }

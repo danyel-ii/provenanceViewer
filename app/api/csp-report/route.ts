@@ -1,3 +1,4 @@
+import { getTrustedClientIp } from "../../_lib/request";
 import { checkTokenBucket } from "../../_lib/rateLimit";
 
 export const dynamic = "force-dynamic";
@@ -50,18 +51,6 @@ function getConfig() {
     limit,
     windowMs: windowSeconds * 1000,
   };
-}
-
-function getClientKey(request: Request) {
-  const forwardedFor = request.headers.get("x-forwarded-for");
-  if (forwardedFor) {
-    return forwardedFor.split(",")[0]?.trim() ?? "unknown";
-  }
-  const realIp = request.headers.get("x-real-ip");
-  if (realIp) {
-    return realIp.trim();
-  }
-  return "unknown";
 }
 
 function normalizeContentType(contentType: string | null) {
@@ -196,8 +185,8 @@ export async function POST(request: Request) {
     }
   }
 
-  const clientKey = `csp:${getClientKey(request)}`;
-  const rate = checkTokenBucket(clientKey, limit, windowMs);
+  const clientKey = `csp:${getTrustedClientIp(request)}`;
+  const rate = await checkTokenBucket(clientKey, limit, windowMs);
   if (!rate.allowed) {
     return noContent();
   }

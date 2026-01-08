@@ -4,6 +4,7 @@ import { useEffect } from "react";
 
 const FLOCK_DELAY_MS = 900;
 const MOVE_DURATION_MS = 1800;
+const FLOCK_STORAGE_KEY = "cubixles_notes_flock_v1";
 
 export default function NotesFlockAnimator() {
   useEffect(() => {
@@ -15,6 +16,17 @@ export default function NotesFlockAnimator() {
     let timeoutRef: number | null = null;
     let dockTimeoutRef: number | null = null;
     let animationFrameRef: number | null = null;
+
+    try {
+      if (window.localStorage.getItem(FLOCK_STORAGE_KEY) === "1") {
+        overlay.classList.add("dock");
+        document.body.classList.add("notes-docked");
+        return;
+      }
+      window.localStorage.setItem(FLOCK_STORAGE_KEY, "1");
+    } catch {
+      // Ignore storage access errors (private mode, blocked storage).
+    }
 
     const layoutTiles = () => {
       if (timeoutRef) {
@@ -77,10 +89,8 @@ export default function NotesFlockAnimator() {
     };
 
     layoutTiles();
-    window.addEventListener("resize", layoutTiles);
 
     return () => {
-      window.removeEventListener("resize", layoutTiles);
       if (timeoutRef) {
         window.clearTimeout(timeoutRef);
       }
