@@ -158,20 +158,16 @@ a {
   background: transparent;
   z-index: 40;
   opacity: 0;
-  animation: cube-fade-in 900ms ease 200ms forwards;
+  transition: opacity var(--cube-fade-duration, 1200ms) ease;
+  will-change: opacity;
   box-shadow:
     0 0 40px rgba(245, 237, 220, 0.9),
     0 0 80px rgba(215, 205, 190, 0.55),
     inset 0 0 26px rgba(255, 255, 255, 0.75);
 }
 
-@keyframes cube-fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+body.cube-fade-in .landing-home .landing-cube-icon {
+  opacity: 1;
 }
 
 .landing-header {

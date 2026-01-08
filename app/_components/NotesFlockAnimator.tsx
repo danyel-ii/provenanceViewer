@@ -4,6 +4,8 @@ import { useEffect } from "react";
 
 const FLOCK_DELAY_MS = 900;
 const MOVE_DURATION_MS = 1800;
+const OVERLAY_FADE_MS = 520;
+const QUICK_FADE_MS = 600;
 const FLOCK_STORAGE_KEY = "cubixles_notes_flock_v1";
 const DEFAULT_NAV_TYPE = "navigate";
 
@@ -52,6 +54,12 @@ export default function NotesFlockAnimator() {
     let animationFrameRef: number | null = null;
     let lastRun = 0;
 
+    const setCubeFadeTiming = (durationMs: number) => {
+      const clamped = Math.max(0, durationMs);
+      document.body.style.setProperty("--cube-fade-duration", `${clamped}ms`);
+      document.body.classList.add("cube-fade-in");
+    };
+
     try {
       const storedRaw = window.localStorage.getItem(FLOCK_STORAGE_KEY);
       let stored: FlockStorage | null = null;
@@ -72,6 +80,7 @@ export default function NotesFlockAnimator() {
         !stored || (navigationType === "reload" && orientationMatches);
 
       if (!shouldRun) {
+        setCubeFadeTiming(QUICK_FADE_MS);
         overlay.classList.add("dock");
         document.body.classList.add("notes-docked");
         window.localStorage.setItem(
@@ -143,6 +152,10 @@ export default function NotesFlockAnimator() {
           tile.style.setProperty("--dy", `${dy}px`);
         });
 
+        const totalDuration =
+          FLOCK_DELAY_MS + maxDelay + MOVE_DURATION_MS + OVERLAY_FADE_MS;
+        setCubeFadeTiming(totalDuration);
+
         timeoutRef = window.setTimeout(
           () => overlay.classList.add("flock"),
           FLOCK_DELAY_MS
@@ -167,6 +180,8 @@ export default function NotesFlockAnimator() {
         window.cancelAnimationFrame(animationFrameRef);
       }
       document.body.classList.remove("notes-docked");
+      document.body.classList.remove("cube-fade-in");
+      document.body.style.removeProperty("--cube-fade-duration");
     };
   }, []);
 
