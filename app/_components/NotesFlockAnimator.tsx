@@ -54,9 +54,12 @@ export default function NotesFlockAnimator() {
     let animationFrameRef: number | null = null;
     let lastRun = 0;
 
-    const setCubeFadeTiming = (durationMs: number) => {
+    const setCubeFadeDuration = (durationMs: number) => {
       const clamped = Math.max(0, durationMs);
       document.body.style.setProperty("--cube-fade-duration", `${clamped}ms`);
+    };
+
+    const startCubeFade = () => {
       document.body.classList.add("cube-fade-in");
     };
 
@@ -80,7 +83,8 @@ export default function NotesFlockAnimator() {
         !stored || (navigationType === "reload" && orientationMatches);
 
       if (!shouldRun) {
-        setCubeFadeTiming(QUICK_FADE_MS);
+        setCubeFadeDuration(QUICK_FADE_MS);
+        startCubeFade();
         overlay.classList.add("dock");
         document.body.classList.add("notes-docked");
         window.localStorage.setItem(
@@ -117,6 +121,7 @@ export default function NotesFlockAnimator() {
       overlay.classList.remove("flock");
       overlay.classList.remove("dock");
       document.body.classList.remove("notes-docked");
+      document.body.classList.remove("cube-fade-in");
 
       animationFrameRef = window.requestAnimationFrame(() => {
         const targetNode = document.querySelector<HTMLElement>("[data-cube-icon]");
@@ -152,12 +157,14 @@ export default function NotesFlockAnimator() {
           tile.style.setProperty("--dy", `${dy}px`);
         });
 
-        const totalDuration =
-          FLOCK_DELAY_MS + maxDelay + MOVE_DURATION_MS + OVERLAY_FADE_MS;
-        setCubeFadeTiming(totalDuration);
+        const totalDuration = maxDelay + MOVE_DURATION_MS + OVERLAY_FADE_MS;
+        setCubeFadeDuration(totalDuration);
 
         timeoutRef = window.setTimeout(
-          () => overlay.classList.add("flock"),
+          () => {
+            overlay.classList.add("flock");
+            startCubeFade();
+          },
           FLOCK_DELAY_MS
         );
         dockTimeoutRef = window.setTimeout(() => {
