@@ -13,6 +13,7 @@
 - [x] Add vector index (choose one):
   - Simple local: `@xenova/transformers` embeddings + sqlite/JSON (ok for small KB)
   - Postgres+pgvector (durable)
+  - Implemented with `@xenova/transformers` + `kb/vectors.json` via `scripts/kb_embed.mjs`
 - [x] Implement `/api/help`:
   - input: `{ message, diagnostics? }`
   - retrieve topK

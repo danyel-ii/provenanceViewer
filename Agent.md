@@ -8,7 +8,7 @@ This app MUST NOT mint, sign, or write to any blockchain.
 
 The app is a Next.js application deployed to an existing Vercel project:
 - Project name: "provenance-viewer"
-- Purpose: offchain inspection, provenance inference, and verification
+- Purpose: off-chain inspection, provenance inference, and verification
 
 ---
 
@@ -64,9 +64,9 @@ Never claim certainty.
 
 You must assume these are present in `.env` and Vercel:
 
-- `ALCHEMY_KEY`
-- `CUBIXLES_CONTRACT`
-- `NETWORK` (e.g. `eth-mainnet`, `polygon-mainnet`)
+- `ALCHEMY_KEY` (or `ALCHEMY_API_KEY`)
+- `CUBIXLES_CONTRACT` (or `CUBIXLES_CONTRACT_ADDRESS`)
+- `NETWORK` (or `CUBIXLES_CHAIN_ID`/`BASE_CHAIN_ID` for auto-mapping)
 - `CACHE_PROVIDER` (optional)
 - `REDIS_URL` (optional)
 
@@ -76,11 +76,11 @@ You must create `.env.example` but NEVER commit secrets.
 
 ## 4. Execution rules for autonomy
 
-- Work strictly in the order defined in `TODO.md`
+- Work strictly in the order defined in `To-Do.md`
 - Implement the smallest vertical slice first
 - After each milestone:
   1. verify local dev works
-  2. update TODO.md checkboxes
+  2. update `To-Do.md` checkboxes
 - If a decision is ambiguous:
   - make a reasonable assumption
   - write it to `docs/decisions.md`

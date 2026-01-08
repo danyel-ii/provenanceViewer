@@ -17,9 +17,9 @@ If you hit npm cache permission issues, use `npm install --cache .npm-cache`.
 
 Copy `.env.example` to `.env.local` and fill in values:
 - `ALCHEMY_KEY` (or `ALCHEMY_API_KEY`)
-- `CUBIXLES_CONTRACT` (or `CUBIXLES_CONTRACT_ADDRESS`) — mainnet: `0x61EdB3bff9c758215Bc8C0B2eAcf2a56c638a6f2`
+- `CUBIXLES_CONTRACT` (or `CUBIXLES_CONTRACT_ADDRESS`, mainnet: `0x61EdB3bff9c758215Bc8C0B2eAcf2a56c638a6f2`)
 - `NETWORK` (or `CUBIXLES_CHAIN_ID`/`BASE_CHAIN_ID` for auto-mapping)
-- Optional: `CUBIXLES_BASE_CONTRACT_ADDRESS` — Base: `0x428032392237cb3BA908a6743994380DCFE7Bb74` (not used yet)
+- Optional: `CUBIXLES_BASE_CONTRACT_ADDRESS` (Base: `0x428032392237cb3BA908a6743994380DCFE7Bb74`, not used yet)
 - `NEXT_PUBLIC_BASE_PATH` (default `/inspecta_deck` for subpath deployments)
 - `NEXT_PUBLIC_BASE_URL` (optional absolute URL for server-side metadata/linking)
 
@@ -31,9 +31,22 @@ Optional caching and rate limits:
 - `KV_REST_API_URL`, `KV_REST_API_TOKEN`, `KV_REST_API_READ_ONLY_TOKEN`
 - `HELPDESK_RATE_LIMIT`, `HELPDESK_RATE_WINDOW_SECONDS`
 
+Optional CSP and framing:
+- `FRAME_ANCESTORS` (space-delimited origins for `frame-ancestors`)
+- `CSP_REPORT_MAX_BYTES`, `CSP_REPORT_RATE_LIMIT`, `CSP_REPORT_RATE_WINDOW_SECONDS`
+
+Optional helpdesk LLM configuration:
+- `HELPDESK_LLM_API_KEY` (or `OPENAI_API_KEY`)
+- `HELPDESK_LLM_BASE_URL`, `HELPDESK_LLM_MODEL`
+
 Optional mint audit enrichment:
-- `ALCHEMY_API_KEY` (used by `/m/[tokenId]` metadata lookups)
-- `MAINNET_RPC_URL` + `CUBIXLES_CONTRACT_ADDRESS` (enables `alchemy_getAssetTransfers`)
+- `ALCHEMY_API_KEY` + `CUBIXLES_CONTRACT_ADDRESS` (used by `/m/[tokenId]` metadata lookups)
+- `CUBIXLES_CHAIN_ID` (selects the v2 Alchemy base for mint audit; default 1)
+- `MAINNET_RPC_URL` (enables `alchemy_getAssetTransfers` on mainnet)
+
+Optional helpdesk KB upkeep:
+- `node scripts/kb_build.mjs` to rebuild `kb/index.jsonl`
+- `node scripts/kb_embed.mjs` to generate `kb/vectors.json` for semantic search
 
 ## API endpoints
 - `GET /api/poc/tokens?limit=&pageKey=&all=true&maxPages=`
@@ -46,7 +59,9 @@ Optional mint audit enrichment:
 - `POST /api/token/:id/verify`
   - Read-only verification (ownerOf + tokenURI). Rate limited.
 - `POST /api/help`
-  - RAG helpdesk endpoint (returns answer + citations).
+  - RAG helpdesk endpoint (returns answer, citations, confidence).
+- `POST /api/csp-report`
+  - CSP report collector (rate limited, returns 204).
 
 ## Frontend routes
 All routes are served under `NEXT_PUBLIC_BASE_PATH` when configured (default `/inspecta_deck`).

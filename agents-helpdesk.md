@@ -49,8 +49,9 @@ Implement an AI helpdesk for **cubixles_** that is:
 - Default topK = 8 chunks
 - Prefer docs over code when both match
 - Chunking guidelines:
-  - docs: split by headings, ~600–1200 tokens
-  - code: split by file + function; include line ranges
+  - docs: split by headings, up to ~120 lines per chunk
+  - code: split by file + function, up to ~160 lines per chunk
+  - other: up to ~200 lines per chunk
 
 ## Answer format (required)
 - 1–3 short paragraphs
@@ -87,7 +88,7 @@ Implement an AI helpdesk for **cubixles_** that is:
   - `/api/help` endpoint handles RAG
   - secrets only server-side (LLM API key)
   - rate limit per IP
-  - log only request id + duration + status + hashed ip
+  - log only request id + duration + status
 
 ## Acceptance tests
 Use `tests/helpdesk_eval.json` as the current acceptance list; answers should cite those sources.

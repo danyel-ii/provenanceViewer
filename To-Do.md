@@ -1,7 +1,7 @@
-# TODO.md — cubixles_ Provenance Viewer (Read-only)
+# To-Do.md - cubixles_ Provenance Viewer (Read-only)
 
 Goal:
-Build an offchain, read-only provenance viewer for NFTs minted in another app.
+Build an off-chain, read-only provenance viewer for NFTs minted in another app.
 All NFTs originate from CUBIXLES_CONTRACT.
 
 ---

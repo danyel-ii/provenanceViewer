@@ -33,9 +33,10 @@
 - Default the viewer to `/inspecta_deck` even if `NEXT_PUBLIC_BASE_PATH` is unset or `/`, to keep subpath hosting consistent.
 
 ## CSP middleware
-- TODO.md is not present; proceeding with nonce-based CSP middleware per user request.
-- Viewer pages are forced dynamic so Next can attach CSP nonces to inline scripts per request.
+- Viewer pages are forced dynamic so Next can attach per-request CSP nonces.
+- `FRAME_ANCESTORS` can override the default `frame-ancestors` list.
 - `/api/csp-report` accepts CSP telemetry, enforces size/type checks, rate limits per client, strips query/hash from URLs, and returns 204.
+- `CSP_REPORT_MAX_BYTES`, `CSP_REPORT_RATE_LIMIT`, `CSP_REPORT_RATE_WINDOW_SECONDS` tune report limits.
 
 ## Base path
 - App is configured with `NEXT_PUBLIC_BASE_PATH` (default `/inspecta_deck`) and `assetPrefix` to support subpath hosting.
