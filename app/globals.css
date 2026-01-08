@@ -155,7 +155,7 @@ a {
 
 .landing-home .landing-cube-icon {
   border-color: rgba(0, 0, 0, 0.15);
-  background: #e8e0d4;
+  background: transparent;
   z-index: 40;
   box-shadow:
     0 0 40px rgba(245, 237, 220, 0.9),
