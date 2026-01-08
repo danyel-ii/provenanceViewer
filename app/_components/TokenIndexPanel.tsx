@@ -191,12 +191,27 @@ export default function TokenIndexPanel() {
             cache: "no-store",
           }
         );
-        const data = (await response.json()) as TokenListResponse & {
-          error?: string;
-        };
+        const raw = await response.text();
+        let data: (TokenListResponse & { error?: string }) | null = null;
+
+        if (raw) {
+          try {
+            data = JSON.parse(raw) as TokenListResponse & { error?: string };
+          } catch {
+            if (response.ok) {
+              throw new Error("Token list response was malformed.");
+            }
+          }
+        }
 
         if (!response.ok) {
-          throw new Error(data.error ?? "token_list_failed");
+          throw new Error(
+            data?.error ?? `Token list request failed (${response.status}).`
+          );
+        }
+
+        if (!data) {
+          throw new Error("Token list response was empty.");
         }
 
         const incoming = Array.isArray(data.tokens) ? data.tokens : [];

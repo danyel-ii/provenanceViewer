@@ -55,6 +55,7 @@ const COLLAGE_ANCHORS = [
 ];
 
 const DRIFT_SPEED = 0.0012;
+const DRIFT_DELAY_MS = 600;
 const SCALE_RATIO = 0.32;
 const TILE_GRID = 7;
 const TILE_STROKE = [20, 22, 28, 90] as const;
@@ -66,7 +67,7 @@ export function createLandingSketch(p5: any, options: SketchOptions) {
   let targetY = 0;
   let dragging = false;
   let lastPointer = { x: 0, y: 0 };
-  let lastInteraction = 0;
+  let lastInteraction = -DRIFT_DELAY_MS;
   let lastFaceId: FaceDefinition["id"] | null = null;
   let lastEmit = 0;
   const faceMap = FACE_REGISTRY.reduce<Record<FaceDefinition["id"], FaceDefinition>>(
@@ -96,7 +97,7 @@ export function createLandingSketch(p5: any, options: SketchOptions) {
   const updateRotation = () => {
     rotationX += (targetX - rotationX) * 0.08;
     rotationY += (targetY - rotationY) * 0.08;
-    if (!dragging && p5.millis() - lastInteraction > 2400) {
+    if (!dragging && p5.millis() - lastInteraction > DRIFT_DELAY_MS) {
       targetY += DRIFT_SPEED;
       targetX += DRIFT_SPEED * 0.6;
     }

@@ -24,7 +24,9 @@ export default function LandingHero({ onFaceChange }: LandingHeroProps) {
       </div>
       <div className="landing-hero-copy">
         <h1 className="landing-title">
-          <CubixlesLogo />
+          <a href="https://www.cubixles.xyz" className="cubixles-logo-link">
+            <CubixlesLogo />
+          </a>
         </h1>
         <p className="landing-subhead">
           A provenance cube: NFTs as materials, citations as structure.

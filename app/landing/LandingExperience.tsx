@@ -11,7 +11,9 @@ export default function LandingExperience() {
       <section className="landing-header">
         <div className="landing-intro">
           <h1 className="landing-title">
-            <CubixlesLogo />
+            <a href="https://www.cubixles.xyz" className="cubixles-logo-link">
+              <CubixlesLogo />
+            </a>
           </h1>
           <p className="landing-subhead">
             Provenance as building blocks, NFTs as materials, and citations as
