@@ -1762,14 +1762,14 @@ body.notes-docked {
 }
 
 .token-index-links .token-index-inspect {
-  background: rgba(255, 255, 255, 0.16);
-  border-color: rgba(255, 255, 255, 0.6);
-  color: #f7f7fa;
-  box-shadow: 0 8px 18px rgba(8, 10, 15, 0.35);
+  background: linear-gradient(135deg, #f5f1e8, #d4cdbd);
+  border-color: rgba(255, 255, 255, 0.75);
+  color: #101217;
+  box-shadow: 0 10px 24px rgba(10, 10, 12, 0.35);
 }
 
 .token-index-links .token-index-inspect:hover {
-  background: rgba(255, 255, 255, 0.24);
+  background: linear-gradient(135deg, #fbf8f1, #ddd6c6);
 }
 
 @media (max-width: 768px) {

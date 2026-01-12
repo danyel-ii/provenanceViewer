@@ -89,9 +89,10 @@ function getBaseUrl() {
   const envUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const normalizedBasePath = getBasePath();
   if (envUrl) {
-    return envUrl.endsWith(normalizedBasePath)
-      ? envUrl
-      : `${envUrl}${normalizedBasePath}`;
+    const normalizedEnv = envUrl.replace(/\/$/, "");
+    return normalizedEnv.endsWith(normalizedBasePath)
+      ? normalizedEnv
+      : `${normalizedEnv}${normalizedBasePath}`;
   }
   const headerList = headers();
   const host = headerList.get("x-forwarded-host") ?? headerList.get("host");
