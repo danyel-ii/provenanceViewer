@@ -17,7 +17,12 @@ export async function POST(
     return NextResponse.json({ error: "invalid_token_id" }, { status: 400 });
   }
 
-  const { contractAddress, network } = getEnvConfig();
+  const url = new URL(request.url);
+  const chainIdParam = url.searchParams.get("chainId");
+  const chainIdRaw = chainIdParam ? Number.parseInt(chainIdParam, 10) : NaN;
+  const chainId = Number.isFinite(chainIdRaw) ? chainIdRaw : undefined;
+
+  const { contractAddress, network } = getEnvConfig(chainId);
   const { limit, windowMs } = getVerifyRateLimitConfig();
   const clientKey = `verify:${getTrustedClientIp(request)}`;
   const rate = await checkRateLimit(clientKey, limit, windowMs);
@@ -36,8 +41,8 @@ export async function POST(
 
   try {
     const [owner, tokenUri] = await Promise.all([
-      readOwnerOf(tokenId),
-      readTokenUri(tokenId),
+      readOwnerOf(tokenId, chainId),
+      readTokenUri(tokenId, chainId),
     ]);
 
     return NextResponse.json({

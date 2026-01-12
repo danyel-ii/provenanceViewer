@@ -460,13 +460,26 @@ function formatJson(value: Record<string, unknown> | null) {
   }
 }
 
-export default async function TokenPage({ params }: { params: { id: string } }) {
+export default async function TokenPage({
+  params,
+  searchParams,
+}: {
+  params: { id: string };
+  searchParams?: Record<string, string | string[] | undefined>;
+}) {
   const baseUrl = getBaseUrl();
   const tokenId = params.id;
+  const chainIdParam =
+    typeof searchParams?.chainId === "string" ? searchParams.chainId : undefined;
+  const chainIdRaw = chainIdParam ? Number.parseInt(chainIdParam, 10) : NaN;
+  const chainId = Number.isFinite(chainIdRaw) ? chainIdRaw : undefined;
+  const chainQuery = chainId ? `?chainId=${chainId}` : "";
 
   const [tokenRes, provenanceRes] = await Promise.all([
-    fetch(`${baseUrl}/api/token/${tokenId}`, { cache: "no-store" }),
-    fetch(`${baseUrl}/api/token/${tokenId}/provenance`, { cache: "no-store" }),
+    fetch(`${baseUrl}/api/token/${tokenId}${chainQuery}`, { cache: "no-store" }),
+    fetch(`${baseUrl}/api/token/${tokenId}/provenance${chainQuery}`, {
+      cache: "no-store",
+    }),
   ]);
 
   if (!tokenRes.ok) {
@@ -494,6 +507,12 @@ export default async function TokenPage({ params }: { params: { id: string } }) 
   const provenance = provenanceRes.ok
     ? ((await provenanceRes.json()) as ProvenanceResponse)
     : null;
+
+  const networkLabel = token.network?.toLowerCase() ?? "";
+  const inferredChainId = networkLabel.includes("base") ? 8453 : 1;
+  const activeChainId = chainId ?? inferredChainId;
+  const ethereumHref = withBasePath(`/token/${tokenId}?chainId=1`);
+  const baseHref = withBasePath(`/token/${tokenId}?chainId=8453`);
 
   const resolvedMedia = token.metadata?.media;
   const shortTokenId = truncateMiddle(token.tokenId);
@@ -557,9 +576,26 @@ export default async function TokenPage({ params }: { params: { id: string } }) 
                 {truncateMiddle(token.contractAddress)}
               </span>
             </div>
-            <div className="token-detail-row">
+            <div className="token-detail-row token-chain-toggle">
               <span className="token-detail-label">Network</span>
-              <span className="token-detail-value">{token.network}</span>
+              <div className="token-chain-buttons">
+                <Link
+                  href={ethereumHref}
+                  className={`token-chain-button ${
+                    activeChainId === 1 ? "is-active" : ""
+                  }`}
+                >
+                  Ethereum
+                </Link>
+                <Link
+                  href={baseHref}
+                  className={`token-chain-button ${
+                    activeChainId === 8453 ? "is-active" : ""
+                  }`}
+                >
+                  Base
+                </Link>
+              </div>
             </div>
             <div className="token-detail-row">
               <span className="token-detail-label">Mint tx</span>
@@ -768,7 +804,7 @@ export default async function TokenPage({ params }: { params: { id: string } }) 
         )}
       </CollapsiblePanel>
 
-      <TokenVerifyPanel tokenId={token.tokenId} />
+      <TokenVerifyPanel tokenId={token.tokenId} chainId={chainId} />
 
       <CollapsiblePanel
         eyebrow="Collector unlock"

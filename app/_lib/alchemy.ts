@@ -126,9 +126,10 @@ async function fetchWithRetry(url: string, options: RequestInit, attempts = 3) {
 
 async function alchemyFetch<T>(
   path: string,
-  params: Record<string, string | number | boolean | undefined>
+  params: Record<string, string | number | boolean | undefined>,
+  chainIdOverride?: number
 ): Promise<T> {
-  const baseUrl = getAlchemyNftBaseUrl();
+  const baseUrl = getAlchemyNftBaseUrl(chainIdOverride);
   const url = new URL(`${baseUrl}${path}`);
   Object.entries(params).forEach(([key, value]) => {
     if (value === undefined) {
@@ -153,9 +154,10 @@ async function alchemyFetch<T>(
 
 export async function getNftsForCollection(
   limit: number,
-  pageKey?: string | null
+  pageKey?: string | null,
+  chainIdOverride?: number
 ): Promise<NormalizedCollectionPage> {
-  const { contractAddress, cacheTtls } = getEnvConfig();
+  const { contractAddress, cacheTtls } = getEnvConfig(chainIdOverride);
   const normalizedContract = normalizeAddress(contractAddress);
   if (!normalizedContract) {
     throw new Error("Invalid CUBIXLES_CONTRACT value");
@@ -174,7 +176,8 @@ export async function getNftsForCollection(
         withMetadata: true,
         limit: clampedLimit,
         pageKey: pageKey ?? undefined,
-      }
+      },
+      chainIdOverride
     );
 
     const tokens = (response.nfts ?? [])
@@ -216,8 +219,10 @@ export async function getAllNftsForCollection(options?: {
   pageSize?: number;
   maxPages?: number;
   startPageKey?: string | null;
+  chainId?: number;
 }): Promise<NormalizedCollectionAggregate> {
-  const { contractAddress, cacheTtls } = getEnvConfig();
+  const chainId = options?.chainId;
+  const { contractAddress, cacheTtls } = getEnvConfig(chainId);
   const normalizedContract = normalizeAddress(contractAddress);
   if (!normalizedContract) {
     throw new Error("Invalid CUBIXLES_CONTRACT value");
@@ -246,7 +251,7 @@ export async function getAllNftsForCollection(options?: {
         seenPageKeys.add(pageKey);
       }
 
-      const page = await getNftsForCollection(pageSize, pageKey);
+      const page = await getNftsForCollection(pageSize, pageKey, chainId);
       page.tokens.forEach((token) => {
         tokensById.set(token.tokenId, token);
       });
@@ -273,8 +278,11 @@ export async function getAllNftsForCollection(options?: {
   });
 }
 
-export async function getNftMetadata(tokenId: string): Promise<NormalizedTokenMetadata> {
-  const { contractAddress, cacheTtls } = getEnvConfig();
+export async function getNftMetadata(
+  tokenId: string,
+  chainIdOverride?: number
+): Promise<NormalizedTokenMetadata> {
+  const { contractAddress, cacheTtls } = getEnvConfig(chainIdOverride);
   const normalizedContract = normalizeAddress(contractAddress);
   if (!normalizedContract) {
     throw new Error("Invalid CUBIXLES_CONTRACT value");
@@ -288,11 +296,15 @@ export async function getNftMetadata(tokenId: string): Promise<NormalizedTokenMe
   const cacheKey = `alchemy:metadata:${normalizedContract}:${normalizedTokenId}`;
 
   return getCachedJson(cacheKey, cacheTtls.metadata, async () => {
-    const response = await alchemyFetch<AlchemyMetadataResponse>("/getNFTMetadata", {
-      contractAddress: normalizedContract,
-      tokenId: normalizedTokenId,
-      tokenType: "ERC721",
-    });
+    const response = await alchemyFetch<AlchemyMetadataResponse>(
+      "/getNFTMetadata",
+      {
+        contractAddress: normalizedContract,
+        tokenId: normalizedTokenId,
+        tokenType: "ERC721",
+      },
+      chainIdOverride
+    );
 
     return {
       tokenId: normalizedTokenId,
@@ -312,8 +324,11 @@ export async function getNftMetadata(tokenId: string): Promise<NormalizedTokenMe
   });
 }
 
-export async function getOwnersForToken(tokenId: string): Promise<string[]> {
-  const { contractAddress, cacheTtls } = getEnvConfig();
+export async function getOwnersForToken(
+  tokenId: string,
+  chainIdOverride?: number
+): Promise<string[]> {
+  const { contractAddress, cacheTtls } = getEnvConfig(chainIdOverride);
   const normalizedContract = normalizeAddress(contractAddress);
   const normalizedTokenId = normalizeTokenId(tokenId);
 
@@ -324,10 +339,14 @@ export async function getOwnersForToken(tokenId: string): Promise<string[]> {
   const cacheKey = `alchemy:owners:${normalizedContract}:${normalizedTokenId}`;
 
   return getCachedJson(cacheKey, cacheTtls.owners, async () => {
-    const response = await alchemyFetch<AlchemyOwnersResponse>("/getOwnersForNFT", {
-      contractAddress: normalizedContract,
-      tokenId: normalizedTokenId,
-    });
+    const response = await alchemyFetch<AlchemyOwnersResponse>(
+      "/getOwnersForNFT",
+      {
+        contractAddress: normalizedContract,
+        tokenId: normalizedTokenId,
+      },
+      chainIdOverride
+    );
 
     return response.owners ?? [];
   });

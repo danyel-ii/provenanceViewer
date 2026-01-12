@@ -21,6 +21,11 @@ export async function GET(
     return NextResponse.json({ error: "invalid_token_id" }, { status: 400 });
   }
 
+  const url = new URL(request.url);
+  const chainIdParam = url.searchParams.get("chainId");
+  const chainIdRaw = chainIdParam ? Number.parseInt(chainIdParam, 10) : NaN;
+  const chainId = Number.isFinite(chainIdRaw) ? chainIdRaw : undefined;
+
   const { limit: readLimit, windowMs } = getReadRateLimitConfig();
   const clientKey = `read:${new URL(request.url).pathname}:${getTrustedClientIp(
     request
@@ -38,10 +43,10 @@ export async function GET(
     );
   }
 
-  const { contractAddress, network, cacheTtls } = getEnvConfig();
+  const { contractAddress, network, cacheTtls } = getEnvConfig(chainId);
 
   try {
-    const token = await getNftMetadata(tokenId);
+    const token = await getNftMetadata(tokenId, chainId);
     const normalizedContract = normalizeAddress(contractAddress);
 
     if (

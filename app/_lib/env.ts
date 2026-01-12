@@ -15,7 +15,7 @@ export type EnvConfig = {
   cacheTtls: CacheTtls;
 };
 
-let cachedConfig: EnvConfig | null = null;
+const cachedConfigByChain = new Map<string, EnvConfig>();
 
 const NETWORK_BY_CHAIN_ID: Record<number, string> = {
   1: "eth-mainnet",
@@ -46,21 +46,44 @@ function requireEnv(names: string[], label: string): string {
   throw new Error(`Missing required env var: ${label}`);
 }
 
-function resolveNetwork(): string {
+function resolveChainId(chainIdOverride?: number): number | null {
+  if (typeof chainIdOverride === "number" && Number.isFinite(chainIdOverride)) {
+    return chainIdOverride;
+  }
+  const chainIdRaw = readEnv("CUBIXLES_CHAIN_ID") ?? readEnv("BASE_CHAIN_ID");
+  if (chainIdRaw) {
+    const chainId = Number.parseInt(chainIdRaw, 10);
+    if (Number.isFinite(chainId)) {
+      return chainId;
+    }
+  }
+  return null;
+}
+
+function resolveNetwork(chainIdOverride?: number): string {
+  const chainId = resolveChainId(chainIdOverride);
+  if (chainId && NETWORK_BY_CHAIN_ID[chainId]) {
+    return NETWORK_BY_CHAIN_ID[chainId];
+  }
   const direct = readEnv("NETWORK");
   if (direct) {
     return direct;
   }
+  throw new Error("Missing required env var: NETWORK");
+}
 
-  const chainIdRaw = readEnv("CUBIXLES_CHAIN_ID") ?? readEnv("BASE_CHAIN_ID");
-  if (chainIdRaw) {
-    const chainId = Number.parseInt(chainIdRaw, 10);
-    if (Number.isFinite(chainId) && NETWORK_BY_CHAIN_ID[chainId]) {
-      return NETWORK_BY_CHAIN_ID[chainId];
+function resolveContractAddress(chainIdOverride?: number): string {
+  const chainId = resolveChainId(chainIdOverride);
+  if (chainId === 8453) {
+    const baseContract = readEnv("CUBIXLES_BASE_CONTRACT_ADDRESS");
+    if (baseContract) {
+      return baseContract;
     }
   }
-
-  throw new Error("Missing required env var: NETWORK");
+  return requireEnv(
+    ["CUBIXLES_CONTRACT", "CUBIXLES_CONTRACT_ADDRESS"],
+    "CUBIXLES_CONTRACT"
+  );
 }
 
 function parseNumberEnv(name: string, fallback: number): number {
@@ -72,19 +95,19 @@ function parseNumberEnv(name: string, fallback: number): number {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
-export function getEnvConfig(): EnvConfig {
-  if (cachedConfig) {
-    return cachedConfig;
+export function getEnvConfig(chainIdOverride?: number): EnvConfig {
+  const chainId = resolveChainId(chainIdOverride);
+  const cacheKey = chainId ? String(chainId) : "default";
+  const cached = cachedConfigByChain.get(cacheKey);
+  if (cached) {
+    return cached;
   }
 
   const alchemyKey = requireEnv(["ALCHEMY_KEY", "ALCHEMY_API_KEY"], "ALCHEMY_KEY");
-  const network = resolveNetwork();
-  const contractAddress = requireEnv(
-    ["CUBIXLES_CONTRACT", "CUBIXLES_CONTRACT_ADDRESS"],
-    "CUBIXLES_CONTRACT"
-  );
+  const network = resolveNetwork(chainId);
+  const contractAddress = resolveContractAddress(chainId);
 
-  cachedConfig = {
+  const config = {
     alchemyKey,
     network,
     contractAddress,
@@ -98,16 +121,16 @@ export function getEnvConfig(): EnvConfig {
       verify: parseNumberEnv("CACHE_TTL_VERIFY", 60),
     },
   };
-
-  return cachedConfig;
+  cachedConfigByChain.set(cacheKey, config);
+  return config;
 }
 
-export function getAlchemyNftBaseUrl(): string {
-  const { network, alchemyKey } = getEnvConfig();
+export function getAlchemyNftBaseUrl(chainIdOverride?: number): string {
+  const { network, alchemyKey } = getEnvConfig(chainIdOverride);
   return `https://${network}.g.alchemy.com/nft/v3/${alchemyKey}`;
 }
 
-export function getAlchemyRpcUrl(): string {
-  const { network, alchemyKey } = getEnvConfig();
+export function getAlchemyRpcUrl(chainIdOverride?: number): string {
+  const { network, alchemyKey } = getEnvConfig(chainIdOverride);
   return `https://${network}.g.alchemy.com/v2/${alchemyKey}`;
 }

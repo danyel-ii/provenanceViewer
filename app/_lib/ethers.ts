@@ -12,14 +12,22 @@ const ERC721_ABI = [
 const TRANSFER_EVENT = "Transfer";
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
-let provider: JsonRpcProvider | null = null;
+const providers = new Map<string, JsonRpcProvider>();
 let erc721Interface: Interface | null = null;
 
-export function getProvider() {
-  if (!provider) {
-    provider = new JsonRpcProvider(getAlchemyRpcUrl());
+function getProviderKey(chainIdOverride?: number) {
+  return chainIdOverride ? String(chainIdOverride) : "default";
+}
+
+export function getProvider(chainIdOverride?: number) {
+  const key = getProviderKey(chainIdOverride);
+  const cached = providers.get(key);
+  if (cached) {
+    return cached;
   }
-  return provider;
+  const next = new JsonRpcProvider(getAlchemyRpcUrl(chainIdOverride));
+  providers.set(key, next);
+  return next;
 }
 
 export function getErc721Interface() {
@@ -29,18 +37,18 @@ export function getErc721Interface() {
   return erc721Interface;
 }
 
-export function getErc721Contract() {
-  const { contractAddress } = getEnvConfig();
-  return new Contract(contractAddress, ERC721_ABI, getProvider());
+export function getErc721Contract(chainIdOverride?: number) {
+  const { contractAddress } = getEnvConfig(chainIdOverride);
+  return new Contract(contractAddress, ERC721_ABI, getProvider(chainIdOverride));
 }
 
-export async function getMintedTokenIdsFromReceipt(txHash: string) {
-  const receipt = await getProvider().getTransactionReceipt(txHash);
+export async function getMintedTokenIdsFromReceipt(txHash: string, chainIdOverride?: number) {
+  const receipt = await getProvider(chainIdOverride).getTransactionReceipt(txHash);
   if (!receipt) {
     return [];
   }
 
-  const { contractAddress } = getEnvConfig();
+  const { contractAddress } = getEnvConfig(chainIdOverride);
   const normalizedContract = normalizeAddress(contractAddress);
   const iface = getErc721Interface();
   const mintedTokenIds: string[] = [];
@@ -74,12 +82,12 @@ export async function getMintedTokenIdsFromReceipt(txHash: string) {
   return Array.from(new Set(mintedTokenIds));
 }
 
-export async function readOwnerOf(tokenId: string) {
-  const contract = getErc721Contract();
+export async function readOwnerOf(tokenId: string, chainIdOverride?: number) {
+  const contract = getErc721Contract(chainIdOverride);
   return contract.ownerOf(tokenId);
 }
 
-export async function readTokenUri(tokenId: string) {
-  const contract = getErc721Contract();
+export async function readTokenUri(tokenId: string, chainIdOverride?: number) {
+  const contract = getErc721Contract(chainIdOverride);
   return contract.tokenURI(tokenId);
 }

@@ -17,9 +17,10 @@ type VerifyResponse = {
 
 type TokenVerifyPanelProps = {
   tokenId: string;
+  chainId?: number;
 };
 
-export default function TokenVerifyPanel({ tokenId }: TokenVerifyPanelProps) {
+export default function TokenVerifyPanel({ tokenId, chainId }: TokenVerifyPanelProps) {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">(
     "idle"
   );
@@ -30,7 +31,8 @@ export default function TokenVerifyPanel({ tokenId }: TokenVerifyPanelProps) {
     setResult(null);
 
     try {
-      const response = await fetch(withBasePath(`/api/token/${tokenId}/verify`), {
+      const query = chainId ? `?chainId=${chainId}` : "";
+      const response = await fetch(withBasePath(`/api/token/${tokenId}/verify${query}`), {
         method: "POST",
       });
       const data = (await response.json()) as VerifyResponse;

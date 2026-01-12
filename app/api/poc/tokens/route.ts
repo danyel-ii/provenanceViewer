@@ -29,8 +29,12 @@ export async function GET(request: Request) {
       );
     }
 
-    const { network, contractAddress } = getEnvConfig();
-    const { searchParams } = new URL(request.url);
+    const url = new URL(request.url);
+    const { searchParams } = url;
+    const chainIdParam = searchParams.get("chainId");
+    const chainIdRaw = chainIdParam ? Number.parseInt(chainIdParam, 10) : NaN;
+    const chainId = Number.isFinite(chainIdRaw) ? chainIdRaw : undefined;
+    const { network, contractAddress } = getEnvConfig(chainId);
     const limitParam = searchParams.get("limit");
     const pageKeyParam = searchParams.get("pageKey");
     const allParam = searchParams.get("all");
@@ -46,8 +50,8 @@ export async function GET(request: Request) {
     const pageKey =
       pageKeyParam && pageKeyParam.trim().length > 0 ? pageKeyParam : undefined;
     const result = all
-      ? await getAllNftsForCollection({ pageSize: limit, maxPages })
-      : await getNftsForCollection(limit, pageKey);
+      ? await getAllNftsForCollection({ pageSize: limit, maxPages, chainId })
+      : await getNftsForCollection(limit, pageKey, chainId);
 
     return NextResponse.json({
       network,

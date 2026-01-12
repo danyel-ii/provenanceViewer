@@ -34,8 +34,8 @@
 - Use Alchemy `pageKey` for `getNFTsForCollection`; expose `pageKey` to clients.
 - `all=true` aggregates pages with a safety cap to avoid long-running requests.
 
-## Base placeholder
-- Include `CUBIXLES_BASE_CONTRACT_ADDRESS` in `.env.example` (Base: `0x428032392237cb3BA908a6743994380DCFE7Bb74`); not used in runtime yet.
+## Base contract support
+- Use `CUBIXLES_BASE_CONTRACT_ADDRESS` (Base: `0x4130F69f396f5478CFD1e1792e2970da4299383a`) when `chainId=8453`.
 
 ## Base path enforcement
 - Default the viewer to `/inspecta_deck` even if `NEXT_PUBLIC_BASE_PATH` is unset or `/`, to keep subpath hosting consistent.

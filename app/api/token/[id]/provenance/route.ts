@@ -29,6 +29,11 @@ export async function GET(
     return NextResponse.json({ error: "invalid_token_id" }, { status: 400 });
   }
 
+  const url = new URL(request.url);
+  const chainIdParam = url.searchParams.get("chainId");
+  const chainIdRaw = chainIdParam ? Number.parseInt(chainIdParam, 10) : NaN;
+  const chainId = Number.isFinite(chainIdRaw) ? chainIdRaw : undefined;
+
   const { limit: readLimit, windowMs } = getReadRateLimitConfig();
   const clientKey = `read:${new URL(request.url).pathname}:${getTrustedClientIp(
     request
@@ -46,12 +51,12 @@ export async function GET(
     );
   }
 
-  const { contractAddress, network, cacheTtls } = getEnvConfig();
-  const cacheKey = `provenance:${tokenId}`;
+  const { contractAddress, network, cacheTtls } = getEnvConfig(chainId);
+  const cacheKey = `provenance:${tokenId}:${chainId ?? "default"}`;
 
   try {
     const payload = await getCachedJson(cacheKey, cacheTtls.provenance, async () => {
-      const token = await getNftMetadata(tokenId);
+      const token = await getNftMetadata(tokenId, chainId);
       const resolvedMetadata = token.tokenUri?.raw
         ? await resolveMetadata(tokenId, token.tokenUri.raw, cacheTtls.metadata)
         : resolveMetadataFromObject(tokenId, token.metadata);
@@ -63,7 +68,10 @@ export async function GET(
       let mintedTokenIds: string[] = [];
 
       if (token.mint?.transactionHash) {
-        mintedTokenIds = await getMintedTokenIdsFromReceipt(token.mint.transactionHash);
+        mintedTokenIds = await getMintedTokenIdsFromReceipt(
+          token.mint.transactionHash,
+          chainId
+        );
         sameTransactionReferences = buildSameTransactionEvidence(
           token.mint.transactionHash,
           mintedTokenIds,
@@ -76,7 +84,7 @@ export async function GET(
         ...sameTransactionReferences.keys(),
       ]);
 
-      const targetOwners = await getOwnersForToken(tokenId);
+      const targetOwners = await getOwnersForToken(tokenId, chainId);
       const ownerOverlap = new Map();
 
       await Promise.all(
@@ -85,7 +93,7 @@ export async function GET(
             return;
           }
           try {
-            const candidateOwners = await getOwnersForToken(candidateId);
+            const candidateOwners = await getOwnersForToken(candidateId, chainId);
             const overlap = buildOwnerOverlapEvidence(targetOwners, candidateOwners);
             if (overlap) {
               ownerOverlap.set(candidateId, overlap);
