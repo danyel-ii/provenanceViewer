@@ -491,6 +491,16 @@ export default async function TokenPage({
   searchParams?: Record<string, string | string[] | undefined>;
 }) {
   const baseUrl = getBaseUrl();
+  const requestHeaders = headers();
+  const cookieHeader = requestHeaders.get("cookie");
+  const bypassHeader = requestHeaders.get("x-vercel-protection-bypass");
+  const forwardHeaders: HeadersInit = {};
+  if (cookieHeader) {
+    forwardHeaders.cookie = cookieHeader;
+  }
+  if (bypassHeader) {
+    forwardHeaders["x-vercel-protection-bypass"] = bypassHeader;
+  }
   const tokenId = params.id;
   const chainIdParam =
     typeof searchParams?.chainId === "string" ? searchParams.chainId : undefined;
@@ -503,9 +513,13 @@ export default async function TokenPage({
   const requestedOpenSeaUrl = getOpenSeaCollectionLink(requestedChainId);
 
   const [tokenRes, provenanceRes] = await Promise.all([
-    fetch(`${baseUrl}/api/token/${tokenId}${chainQuery}`, { cache: "no-store" }),
+    fetch(`${baseUrl}/api/token/${tokenId}${chainQuery}`, {
+      cache: "no-store",
+      headers: forwardHeaders,
+    }),
     fetch(`${baseUrl}/api/token/${tokenId}/provenance${chainQuery}`, {
       cache: "no-store",
+      headers: forwardHeaders,
     }),
   ]);
 
