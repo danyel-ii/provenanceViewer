@@ -5,7 +5,7 @@ import CollapsiblePanel from "../../_components/CollapsiblePanel";
 import CubixlesText from "../../_components/CubixlesText";
 import FallbackImage from "../../_components/FallbackImage";
 import TokenVerifyPanel from "../../_components/TokenVerifyPanel";
-import { getBasePath, withBasePath } from "../../_lib/basePath";
+import { getBasePath } from "../../_lib/basePath";
 import { resolveMetadataFromObject } from "../../_lib/metadata";
 
 export const dynamic = "force-dynamic";
@@ -474,6 +474,9 @@ export default async function TokenPage({
   const chainIdRaw = chainIdParam ? Number.parseInt(chainIdParam, 10) : NaN;
   const chainId = Number.isFinite(chainIdRaw) ? chainIdRaw : undefined;
   const chainQuery = chainId ? `?chainId=${chainId}` : "";
+  const requestedChainId = chainId ?? 1;
+  const ethereumHref = `/token/${tokenId}?chainId=1`;
+  const baseHref = `/token/${tokenId}?chainId=8453`;
 
   const [tokenRes, provenanceRes] = await Promise.all([
     fetch(`${baseUrl}/api/token/${tokenId}${chainQuery}`, { cache: "no-store" }),
@@ -493,8 +496,29 @@ export default async function TokenPage({
           <p className="panel-body-text">
             Unable to load token metadata. Please verify the token id.
           </p>
+          <div className="token-detail-row token-chain-toggle">
+            <span className="token-detail-label">Network</span>
+            <div className="token-chain-buttons">
+              <Link
+                href={ethereumHref}
+                className={`token-chain-button ${
+                  requestedChainId === 1 ? "is-active" : ""
+                }`}
+              >
+                Ethereum
+              </Link>
+              <Link
+                href={baseHref}
+                className={`token-chain-button ${
+                  requestedChainId === 8453 ? "is-active" : ""
+                }`}
+              >
+                Base
+              </Link>
+            </div>
+          </div>
           <div className="landing-ctas">
-            <Link href={withBasePath("/landing")} className="landing-button secondary">
+            <Link href="/landing" className="landing-button secondary">
               Return to provenance cube
             </Link>
           </div>
@@ -511,8 +535,6 @@ export default async function TokenPage({
   const networkLabel = token.network?.toLowerCase() ?? "";
   const inferredChainId = networkLabel.includes("base") ? 8453 : 1;
   const activeChainId = chainId ?? inferredChainId;
-  const ethereumHref = withBasePath(`/token/${tokenId}?chainId=1`);
-  const baseHref = withBasePath(`/token/${tokenId}?chainId=8453`);
 
   const resolvedMedia = token.metadata?.media;
   const shortTokenId = truncateMiddle(token.tokenId);
@@ -535,7 +557,7 @@ export default async function TokenPage({
         titleAs="h1"
         collapsible={false}
         actions={
-          <Link href={withBasePath("/landing")} className="landing-button secondary">
+          <Link href="/landing" className="landing-button secondary">
             Return to provenance cube
           </Link>
         }

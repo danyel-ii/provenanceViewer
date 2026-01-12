@@ -59,7 +59,7 @@ export default async function TokenPlaceholder({
       <MintAuditPanel focusTokenId={params.tokenId} />
       <CubeProvenanceExplorer cube={cube} requestedTokenId={params.tokenId} />
       <div className="landing-ctas token-landing-ctas">
-        <Link href={withBasePath("/landing")} className="landing-button secondary">
+        <Link href="/landing" className="landing-button secondary">
           Return to provenance cube
         </Link>
       </div>
