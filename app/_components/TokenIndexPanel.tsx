@@ -143,6 +143,7 @@ function useDebouncedValue<T>(value: T, delayMs: number) {
 }
 
 export default function TokenIndexPanel() {
+  const [activeChainId, setActiveChainId] = useState(1);
   const [mode, setMode] = useState<TokenListMode>("page");
   const [tokens, setTokens] = useState<TokenListItem[]>([]);
   const [pageKey, setPageKey] = useState<string | null>(null);
@@ -177,6 +178,7 @@ export default function TokenIndexPanel() {
       try {
         const params = new URLSearchParams();
         params.set("limit", String(pageSizeApplied));
+        params.set("chainId", String(activeChainId));
 
         if (mode === "all") {
           params.set("all", "true");
@@ -241,7 +243,7 @@ export default function TokenIndexPanel() {
         setError(message);
       }
     },
-    [maxPages, mode, pageSizeApplied]
+    [activeChainId, maxPages, mode, pageSizeApplied]
   );
 
   useEffect(() => {
@@ -337,6 +339,29 @@ export default function TokenIndexPanel() {
           </p>
         </div>
         <div className="token-index-actions">
+          <div className="token-index-network" role="group" aria-label="Network">
+            <span className="token-detail-label">Network</span>
+            <div className="token-chain-buttons">
+              <button
+                type="button"
+                className={`token-chain-button ${
+                  activeChainId === 1 ? "is-active" : ""
+                }`}
+                onClick={() => setActiveChainId(1)}
+              >
+                Ethereum
+              </button>
+              <button
+                type="button"
+                className={`token-chain-button ${
+                  activeChainId === 8453 ? "is-active" : ""
+                }`}
+                onClick={() => setActiveChainId(8453)}
+              >
+                Base
+              </button>
+            </div>
+          </div>
           <label className="token-index-control" htmlFor={pageSizeId}>
             <span>Page size</span>
             <input
@@ -440,8 +465,8 @@ export default function TokenIndexPanel() {
               </div>
               <div className="token-index-links">
                 <Link
-                  href={`/token/${token.tokenId}`}
-                  className="landing-button secondary"
+                  href={`/token/${token.tokenId}?chainId=${activeChainId}`}
+                  className="landing-button secondary token-index-inspect"
                 >
                   Inspect token
                 </Link>

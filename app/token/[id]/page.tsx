@@ -333,6 +333,28 @@ function buildOpenSeaCollectionUrl(
   return `https://opensea.io/assets/${chainSlug}/${contractAddress}`;
 }
 
+function getOpenSeaCollectionLink(chainId?: number): string {
+  return chainId === 8453
+    ? "https://opensea.io/collection/cubixles_-292656473"
+    : "https://opensea.io/collection/cubixles";
+}
+
+function OpenSeaIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path
+        d="M12 2.25c-5.384 0-9.75 4.366-9.75 9.75 0 5.384 4.366 9.75 9.75 9.75s9.75-4.366 9.75-9.75c0-5.384-4.366-9.75-9.75-9.75Zm0 1.5a8.25 8.25 0 0 1 8.25 8.25c0 4.556-3.694 8.25-8.25 8.25S3.75 16.556 3.75 12 7.444 3.75 12 3.75Zm-.02 2.45c-.17 0-.33.092-.415.24l-3.99 6.95c-.18.314.046.71.409.71h7.95c.363 0 .59-.396.41-.71l-3.99-6.95a.48.48 0 0 0-.374-.24Zm.02 1.36 2.92 5.09H9.08l2.92-5.09Zm-5.9 7.26c-.31 0-.56.25-.56.56 0 .69 1.24 2.9 6.46 2.9 5.22 0 6.46-2.21 6.46-2.9 0-.31-.25-.56-.56-.56H6.1Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
 function extractReferenceEntries(metadata: Record<string, unknown> | null) {
   if (!metadata) {
     return [];
@@ -477,6 +499,7 @@ export default async function TokenPage({
   const requestedChainId = chainId ?? 1;
   const ethereumHref = `/token/${tokenId}?chainId=1`;
   const baseHref = `/token/${tokenId}?chainId=8453`;
+  const requestedOpenSeaUrl = getOpenSeaCollectionLink(requestedChainId);
 
   const [tokenRes, provenanceRes] = await Promise.all([
     fetch(`${baseUrl}/api/token/${tokenId}${chainQuery}`, { cache: "no-store" }),
@@ -515,6 +538,15 @@ export default async function TokenPage({
               >
                 Base
               </Link>
+              <a
+                className="token-chain-opensea"
+                href={requestedOpenSeaUrl}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Open OpenSea collection"
+              >
+                <OpenSeaIcon />
+              </a>
             </div>
           </div>
           <div className="landing-ctas">
@@ -535,6 +567,7 @@ export default async function TokenPage({
   const networkLabel = token.network?.toLowerCase() ?? "";
   const inferredChainId = networkLabel.includes("base") ? 8453 : 1;
   const activeChainId = chainId ?? inferredChainId;
+  const activeOpenSeaUrl = getOpenSeaCollectionLink(activeChainId);
 
   const resolvedMedia = token.metadata?.media;
   const shortTokenId = truncateMiddle(token.tokenId);
@@ -617,6 +650,15 @@ export default async function TokenPage({
                 >
                   Base
                 </Link>
+                <a
+                  className="token-chain-opensea"
+                  href={activeOpenSeaUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Open OpenSea collection"
+                >
+                  <OpenSeaIcon />
+                </a>
               </div>
             </div>
             <div className="token-detail-row">

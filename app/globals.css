@@ -1451,6 +1451,12 @@ body.cube-fade-in .landing-home .landing-cube-icon {
   align-items: center;
 }
 
+.token-index-network {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .token-index-control {
   display: inline-flex;
   align-items: center;
@@ -1755,6 +1761,17 @@ body.notes-docked {
   margin-top: 4px;
 }
 
+.token-index-links .token-index-inspect {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.6);
+  color: #f7f7fa;
+  box-shadow: 0 8px 18px rgba(8, 10, 15, 0.35);
+}
+
+.token-index-links .token-index-inspect:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
+
 @media (max-width: 768px) {
   .panel-header {
     flex-direction: column;
@@ -1859,6 +1876,7 @@ body.notes-docked {
 }
 
 .token-chain-button {
+  appearance: none;
   padding: 6px 12px;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -1866,6 +1884,7 @@ body.notes-docked {
   color: rgba(247, 247, 252, 0.75);
   font-size: 12px;
   text-decoration: none;
+  cursor: pointer;
   transition:
     border-color 140ms ease,
     color 140ms ease,
@@ -1881,6 +1900,33 @@ body.notes-docked {
   background: rgba(141, 132, 255, 0.25);
   border-color: rgba(141, 132, 255, 0.55);
   color: #f7f7fa;
+}
+
+.token-chain-opensea {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(12, 14, 20, 0.6);
+  color: rgba(247, 247, 252, 0.78);
+  text-decoration: none;
+  transition:
+    border-color 140ms ease,
+    color 140ms ease,
+    background 140ms ease;
+}
+
+.token-chain-opensea:hover {
+  color: #f7f7fa;
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+.token-chain-opensea svg {
+  width: 14px;
+  height: 14px;
 }
 
 .token-detail-label {
