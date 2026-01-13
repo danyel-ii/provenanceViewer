@@ -86,20 +86,21 @@ type TokenReferenceFace = {
 };
 
 function getBaseUrl() {
-  const envUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const normalizedBasePath = getBasePath();
+  const headerList = headers();
+  const host = headerList.get("x-forwarded-host") ?? headerList.get("host");
+  const proto = headerList.get("x-forwarded-proto") ?? "http";
+  if (host) {
+    return `${proto}://${host}${normalizedBasePath}`;
+  }
+  const envUrl = process.env.NEXT_PUBLIC_BASE_URL;
   if (envUrl) {
     const normalizedEnv = envUrl.replace(/\/$/, "");
     return normalizedEnv.endsWith(normalizedBasePath)
       ? normalizedEnv
       : `${normalizedEnv}${normalizedBasePath}`;
   }
-  const headerList = headers();
-  const host = headerList.get("x-forwarded-host") ?? headerList.get("host");
-  const proto = headerList.get("x-forwarded-proto") ?? "http";
-  return host
-    ? `${proto}://${host}${normalizedBasePath}`
-    : `http://localhost:3000${normalizedBasePath}`;
+  return `http://localhost:3000${normalizedBasePath}`;
 }
 
 function truncateMiddle(value: string, start = 6, end = 4) {
