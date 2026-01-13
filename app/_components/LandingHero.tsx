@@ -39,7 +39,7 @@ export default function LandingHero({ onFaceChange }: LandingHeroProps) {
           <Link href="/" className="landing-button primary">
             Enter the Mini App
           </Link>
-          <Link href="/m/1" className="landing-button secondary">
+          <Link href="/m/t/1" className="landing-button secondary">
             View Example Token
           </Link>
           <Link
