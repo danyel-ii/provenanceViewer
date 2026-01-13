@@ -30,3 +30,11 @@ Note: v3 + RPC use whichever of `ALCHEMY_KEY` or `ALCHEMY_API_KEY` is set first.
   - Reads `ownerOf` and `tokenURI` in `/api/token/:id/verify`.
 - `alchemy_getAssetTransfers`
   - Optional mint audit enrichment (requires `MAINNET_RPC_URL` and `CUBIXLES_CONTRACT_ADDRESS`, mainnet only).
+
+## API response notes
+### `/api/token/:id/provenance`
+Response includes the `candidates` list plus:
+- `tokenId`, `contractAddress`, `network`
+- `mintTxHash`
+- `metadataReferenceCount`, `sameTransactionCount`, `ownerOverlapCount`
+- `disclaimer` (heuristic provenance warning)
