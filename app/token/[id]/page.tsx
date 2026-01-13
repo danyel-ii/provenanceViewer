@@ -385,6 +385,58 @@ function getMetadataMinter(metadata: Record<string, unknown> | null): string | n
   return candidate ?? null;
 }
 
+function getMetadataTimestamp(metadata: Record<string, unknown> | null): string | null {
+  if (!metadata) {
+    return null;
+  }
+  const provenance = isRecord(metadata.provenance) ? metadata.provenance : null;
+  const properties = isRecord(metadata.properties) ? metadata.properties : null;
+  const candidate = pickString(
+    provenance?.mintedAt as string | undefined,
+    provenance?.minted_at as string | undefined,
+    provenance?.createdAt as string | undefined,
+    provenance?.created_at as string | undefined,
+    provenance?.timestamp as string | undefined,
+    provenance?.blockTimestamp as string | undefined,
+    provenance?.block_timestamp as string | undefined,
+    provenance?.retrievedAt as string | undefined,
+    provenance?.retrieved_at as string | undefined,
+    metadata.mintedAt as string | undefined,
+    metadata.minted_at as string | undefined,
+    metadata.createdAt as string | undefined,
+    metadata.created_at as string | undefined,
+    metadata.timestamp as string | undefined,
+    metadata.date as string | undefined,
+    properties?.mintedAt as string | undefined,
+    properties?.minted_at as string | undefined,
+    properties?.createdAt as string | undefined,
+    properties?.created_at as string | undefined,
+    properties?.timestamp as string | undefined,
+    properties?.date as string | undefined
+  );
+  if (candidate) {
+    return formatSnapshotDate(candidate) ?? candidate;
+  }
+  const numericCandidate = pickNumber(
+    provenance?.timestamp,
+    provenance?.blockTimestamp,
+    provenance?.block_timestamp,
+    metadata.timestamp,
+    metadata.createdAt,
+    metadata.created_at,
+    properties?.timestamp,
+    properties?.createdAt,
+    properties?.created_at
+  );
+  if (!numericCandidate) {
+    return null;
+  }
+  const millis =
+    numericCandidate > 1_000_000_000_000 ? numericCandidate : numericCandidate * 1000;
+  const iso = new Date(millis).toISOString();
+  return formatSnapshotDate(iso) ?? iso;
+}
+
 function OpenSeaIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -656,7 +708,12 @@ export default async function TokenPage({
     ? truncateLongValue(tokenUriRaw)
     : "View on explorer";
 
-  const resolvedMedia = token.metadata?.media;
+  const resolvedMedia =
+    token.metadata?.media ??
+    resolveMetadataFromObject(
+      token.tokenId,
+      token.metadata?.resolved ?? token.metadata?.raw ?? null
+    ).media;
   const shortTokenId = truncateMiddle(token.tokenId);
   const displayTitleRaw =
     token.title ?? token.name ?? `Token ${token.tokenId}`;
@@ -759,7 +816,11 @@ export default async function TokenPage({
             <div className="token-detail-row">
               <span className="token-detail-label">Minted at</span>
               <span className="token-detail-value">
-                {token.mint?.timestamp ?? "n/a"}
+                {token.mint?.timestamp ??
+                  getMetadataTimestamp(
+                    token.metadata?.resolved ?? token.metadata?.raw ?? null
+                  ) ??
+                  "n/a"}
               </span>
             </div>
             <div className="token-detail-row">

@@ -592,10 +592,43 @@ body.cube-fade-in .landing-home .landing-cube-icon {
   font-weight: 600;
   transition: transform 140ms ease, box-shadow 140ms ease;
   border: 1px solid transparent;
+  position: relative;
+  isolation: isolate;
+  --liquid-border-opacity: 0.32;
+  --liquid-border-speed: 10s;
+  --liquid-border-blur: 0.35px;
 }
 
 .landing-button:hover {
   transform: translateY(-1px);
+}
+
+.landing-button::before,
+.cube-viewer-hud::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from 0deg,
+    rgba(255, 255, 255, 0.95),
+    rgba(165, 168, 178, 0.9),
+    rgba(245, 246, 249, 0.95),
+    rgba(110, 112, 122, 0.85),
+    rgba(248, 248, 252, 0.96),
+    rgba(170, 174, 184, 0.9),
+    rgba(255, 255, 255, 0.95)
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: var(--liquid-border-opacity, 0.35);
+  filter: blur(var(--liquid-border-blur, 0.35px)) saturate(1.15);
+  animation: liquidMetalSpin var(--liquid-border-speed, 10s) linear infinite;
+  pointer-events: none;
 }
 
 .landing-button.primary {
@@ -1762,14 +1795,19 @@ body.notes-docked {
 }
 
 .token-index-links .token-index-inspect {
-  background: linear-gradient(135deg, #f5f1e8, #d4cdbd);
-  border-color: rgba(255, 255, 255, 0.75);
-  color: #101217;
-  box-shadow: 0 10px 24px rgba(10, 10, 12, 0.35);
+  background: rgba(18, 20, 28, 0.45);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: rgba(245, 246, 252, 0.68);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+  --liquid-border-opacity: 0.2;
+  --liquid-border-speed: 13s;
+  --liquid-border-blur: 0.4px;
 }
 
 .token-index-links .token-index-inspect:hover {
-  background: linear-gradient(135deg, #fbf8f1, #ddd6c6);
+  background: rgba(22, 24, 34, 0.52);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(248, 249, 255, 0.78);
 }
 
 .cube-viewer-hud {
@@ -1782,17 +1820,21 @@ body.notes-docked {
   justify-content: center;
   padding: 12px 22px;
   border-radius: 999px;
-  background: linear-gradient(135deg, #ff4fd8, #ff7bf2);
-  color: #160012;
+  background: linear-gradient(145deg, #0b0a12, #1b0f24);
+  color: #fff6fb;
   font-weight: 600;
   text-decoration: none;
-  border: 1px solid rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  isolation: isolate;
+  --liquid-border-opacity: 0.92;
+  --liquid-border-speed: 6s;
+  --liquid-border-blur: 0.55px;
   box-shadow:
-    0 20px 40px rgba(0, 0, 0, 0.45),
-    0 0 18px rgba(255, 61, 214, 0.65),
-    0 0 36px rgba(255, 61, 214, 0.45),
-    0 0 64px rgba(255, 61, 214, 0.35);
-  text-shadow: 0 1px 6px rgba(255, 255, 255, 0.45);
+    0 20px 40px rgba(0, 0, 0, 0.55),
+    0 0 18px rgba(255, 61, 214, 0.75),
+    0 0 44px rgba(255, 61, 214, 0.55),
+    0 0 96px rgba(255, 61, 214, 0.4);
+  text-shadow: 0 0 12px rgba(255, 118, 236, 0.6);
   animation: cubeHudFloat 4.6s ease-in-out infinite;
   transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
 }
@@ -1817,6 +1859,15 @@ body.notes-docked {
   }
   100% {
     transform: translateY(0);
+  }
+}
+
+@keyframes liquidMetalSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
   }
 }
 
