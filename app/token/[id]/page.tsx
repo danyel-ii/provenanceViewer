@@ -900,6 +900,7 @@ export default async function TokenPage({
         eyebrow="Provenance faces"
         title="Selected NFT references"
         subhead="Thumbnails captured in the mint metadata snapshot."
+        defaultOpen
       >
         {referenceFaces.length ? (
           <div className="token-reference-grid">
