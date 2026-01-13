@@ -38,6 +38,42 @@ function tokenize(query) {
     .filter((token) => token.length >= 3 && !stopwords.has(token));
 }
 
+function extractSymbols(query) {
+  const matches = query.match(/\b[A-Za-z][A-Za-z0-9_]*[A-Z][A-Za-z0-9_]*\b/g) ?? [];
+  return Array.from(new Set(matches));
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function definitionBoost(text, symbols) {
+  if (!symbols.length) {
+    return 0;
+  }
+  let boost = 0;
+  for (const symbol of symbols) {
+    const escaped = escapeRegExp(symbol);
+    const functionPattern = new RegExp(
+      `\\b(?:export\\s+)?(?:async\\s+)?function\\s+${escaped}\\b`
+    );
+    const constPattern = new RegExp(
+      `\\b(?:export\\s+)?const\\s+${escaped}\\b`
+    );
+    const classPattern = new RegExp(
+      `\\b(?:export\\s+)?class\\s+${escaped}\\b`
+    );
+    if (functionPattern.test(text)) {
+      boost += 12;
+      continue;
+    }
+    if (constPattern.test(text) || classPattern.test(text)) {
+      boost += 8;
+    }
+  }
+  return boost;
+}
+
 function keywordScore(text, tokens) {
   if (!tokens.length) {
     return 0;
@@ -56,15 +92,17 @@ function keywordScore(text, tokens) {
 
 function rankEntries(entries, query, topK) {
   const tokens = tokenize(query);
+  const symbols = extractSymbols(query);
   const scored = entries
     .map((entry) => {
       const baseScore = keywordScore(entry.text, tokens);
-      if (baseScore <= 0) {
+      const symbolScore = definitionBoost(entry.text, symbols);
+      if (baseScore <= 0 && symbolScore <= 0) {
         return { entry, score: 0 };
       }
       const docMultiplier = entry.path.startsWith("docs/") ? 4 : 1;
       const docBoost = entry.path.startsWith("docs/") ? 6 : 0;
-      return { entry, score: baseScore * docMultiplier + docBoost };
+      return { entry, score: baseScore * docMultiplier + docBoost + symbolScore };
     })
     .filter((item) => item.score > 0);
 
