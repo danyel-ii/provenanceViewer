@@ -9,6 +9,9 @@ import { CUBIXLES_MINTED_CUBES } from "../../_data/minted-cube";
 import { MINT_AUDIT } from "../../_data/mint-audit";
 
 const fallbackCube = CUBIXLES_MINTED_CUBES[MINT_AUDIT.tokenId];
+const TOKEN_VIEWER_PREVIEW_DESCRIPTION =
+  "cubixles_ let you mint nft's whose provenance tethers to artwork you already own";
+const TOKEN_VIEWER_PREVIEW_IMAGE = withBasePath("/assets/deadcatmod.jpg");
 
 export const dynamic = "force-dynamic";
 
@@ -42,29 +45,28 @@ export async function buildTokenViewerMetadata(
   const cube = (await getLiveMintedCube(tokenId)) ?? fallbackCube;
   const baseUrl = getBaseUrl();
   const canonicalUrl = buildViewerUrl(baseUrl, tokenId, shortSlug);
-  const placeholderImage = withBasePath("/ogImage.png");
   const openGraphImages = [
     {
-      url: placeholderImage,
-      width: 1200,
-      height: 630,
+      url: TOKEN_VIEWER_PREVIEW_IMAGE,
+      width: 1024,
+      height: 1024,
     },
   ];
 
   return {
     title: `cubixles_ — Token ${cube.tokenId} audit`,
-    description: cube.description,
+    description: TOKEN_VIEWER_PREVIEW_DESCRIPTION,
     openGraph: {
       title: `cubixles_ — Token ${cube.tokenId} audit`,
-      description: cube.description,
+      description: TOKEN_VIEWER_PREVIEW_DESCRIPTION,
       url: canonicalUrl,
       images: openGraphImages,
     },
     twitter: {
       card: "summary_large_image",
       title: `cubixles_ — Token ${cube.tokenId} audit`,
-      description: cube.description,
-      images: [placeholderImage],
+      description: TOKEN_VIEWER_PREVIEW_DESCRIPTION,
+      images: [TOKEN_VIEWER_PREVIEW_IMAGE],
     },
     metadataBase: new URL(baseUrl),
   };

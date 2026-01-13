@@ -12,6 +12,7 @@ import {
 import FallbackImage from "./FallbackImage";
 import CubixlesText from "./CubixlesText";
 import { withBasePath } from "../_lib/basePath";
+import { encodeTokenIdToBase62 } from "../_lib/shortToken";
 
 type TokenMedia = {
   gateway?: string;
@@ -428,12 +429,19 @@ export default function TokenIndexPanel() {
             : displayTitleRaw;
           const imageCandidates = getTokenImageCandidates(token);
           const isHighlighted = index === highlightIndex;
+          const shortSlug = encodeTokenIdToBase62(token.tokenId);
+          const tokenPath = shortSlug
+            ? `/token/t/${shortSlug}`
+            : `/token/${token.tokenId}`;
+          const tokenHref = `${tokenPath}?chainId=${activeChainId}`;
           return (
-            <article
+            <Link
               key={token.tokenId}
+              href={tokenHref}
               className={`token-index-card${isHighlighted ? " is-highlighted" : ""}`}
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}
+              aria-label={`Inspect token ${token.tokenId}`}
             >
               <div className="token-index-media">
                 <FallbackImage
@@ -464,14 +472,11 @@ export default function TokenIndexPanel() {
                 </span>
               </div>
               <div className="token-index-links">
-                <Link
-                  href={`/token/${token.tokenId}?chainId=${activeChainId}`}
-                  className="landing-button secondary token-index-inspect"
-                >
+                <span className="landing-button secondary token-index-inspect">
                   Inspect token
-                </Link>
+                </span>
               </div>
-            </article>
+            </Link>
           );
         })}
       </div>

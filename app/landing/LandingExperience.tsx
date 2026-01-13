@@ -3,6 +3,7 @@ import LandingCubeIcon from "../_components/LandingCubeIcon";
 import CubixlesLogo from "../_components/CubixlesLogo";
 import NotesFlockOverlay from "../_components/NotesFlockOverlay";
 import TokenIndexPanel from "../_components/TokenIndexPanel";
+import DigItOverlay from "../_components/DigItOverlay";
 
 export default function LandingExperience() {
   return (
@@ -31,6 +32,7 @@ export default function LandingExperience() {
             >
               Mint your own
             </a>
+            <DigItOverlay />
           </div>
         </div>
         <LandingCubeIcon />

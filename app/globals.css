@@ -625,6 +625,148 @@ body.cube-fade-in .landing-home .landing-cube-icon {
   text-transform: uppercase;
 }
 
+.landing-button-dig {
+  position: relative;
+}
+
+.dig-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(24px, 4vw, 48px);
+}
+
+.dig-overlay-backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background: rgba(20, 18, 16, 0.65);
+  backdrop-filter: blur(4px);
+  cursor: pointer;
+}
+
+.dig-overlay-panel {
+  position: relative;
+  z-index: 1;
+  width: min(92vw, 760px);
+  max-height: 86vh;
+  overflow-y: auto;
+  border-radius: 28px 88px 28px 88px;
+  padding: clamp(22px, 3vw, 38px);
+  color: #1b1916;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(255, 255, 255, 0.9), transparent 45%),
+    radial-gradient(circle at 80% 0%, rgba(250, 242, 230, 0.8), transparent 40%),
+    linear-gradient(160deg, rgba(247, 239, 227, 0.98), rgba(230, 220, 205, 0.96));
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+}
+
+.dig-overlay-panel::before,
+.dig-overlay-panel::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.dig-overlay-panel::before {
+  top: -46px;
+  right: 32px;
+  width: 140px;
+  height: 140px;
+  border-radius: 60% 40% 60% 40%;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.6), transparent 65%);
+  transform: rotate(-18deg);
+  opacity: 0.5;
+}
+
+.dig-overlay-panel::after {
+  top: 18%;
+  right: 60px;
+  width: 2px;
+  height: 62%;
+  background: linear-gradient(180deg, transparent, rgba(60, 50, 40, 0.25), transparent);
+  transform: rotate(-8deg);
+}
+
+.dig-overlay-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.dig-overlay-title {
+  margin: 0;
+  font-size: clamp(1.4rem, 2.4vw, 2rem);
+  letter-spacing: -0.02em;
+}
+
+.dig-overlay-close {
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.6);
+  color: #1b1916;
+  padding: 6px 12px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.dig-overlay-close:hover {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.dig-overlay-body {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.dig-overlay-body p {
+  margin: 0;
+}
+
+.dig-overlay-staccato {
+  display: grid;
+  gap: 4px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.dig-overlay-staccato span {
+  display: block;
+}
+
+.dig-overlay-layers {
+  margin: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.dig-overlay-layers div {
+  border-left: 2px solid rgba(0, 0, 0, 0.12);
+  padding-left: 12px;
+}
+
+.dig-overlay-layers dt {
+  margin: 0 0 4px;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.dig-overlay-layers dd {
+  margin: 0;
+}
+
 .provenance-panel {
   border-radius: 24px;
   padding: clamp(20px, 3vw, 32px);
@@ -1524,6 +1666,8 @@ body.cube-fade-in .landing-home .landing-cube-icon {
   background: rgba(255, 255, 255, 0.02);
   scroll-snap-align: start;
   min-width: 0;
+  text-decoration: none;
+  color: inherit;
 }
 
 .token-index-media {
