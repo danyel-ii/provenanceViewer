@@ -5,8 +5,10 @@ import CollapsiblePanel from "../../_components/CollapsiblePanel";
 import CubixlesText from "../../_components/CubixlesText";
 import FallbackImage from "../../_components/FallbackImage";
 import TokenVerifyPanel from "../../_components/TokenVerifyPanel";
+import { getNftMetadata } from "../../_lib/alchemy";
 import { getBasePath } from "../../_lib/basePath";
-import { resolveMetadataFromObject } from "../../_lib/metadata";
+import { getEnvConfig } from "../../_lib/env";
+import { resolveMetadata, resolveMetadataFromObject } from "../../_lib/metadata";
 
 export const dynamic = "force-dynamic";
 
@@ -105,6 +107,100 @@ function getBaseUrl() {
       : `${normalizedEnv}${normalizedBasePath}`;
   }
   return `http://localhost:3000${normalizedBasePath}`;
+}
+
+function buildAbsoluteUrl(baseUrl: string, path: string, chainId?: number) {
+  const normalizedBase = baseUrl.replace(/\/$/, "");
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  const url = new URL(`${normalizedBase}${normalizedPath}`);
+  if (chainId) {
+    url.searchParams.set("chainId", String(chainId));
+  }
+  return url.toString();
+}
+
+function getChainIdFromSearchParams(
+  searchParams?: Record<string, string | string[] | undefined>
+): number | undefined {
+  const value = searchParams?.chainId;
+  if (Array.isArray(value)) {
+    return parseChainId(value[0]);
+  }
+  return parseChainId(value);
+}
+
+async function resolveTokenOgData(tokenId: string, chainId?: number) {
+  try {
+    const token = await getNftMetadata(tokenId, chainId);
+    const { cacheTtls } = getEnvConfig(chainId);
+    let resolvedMedia = resolveMetadataFromObject(
+      tokenId,
+      token.metadata ?? null
+    ).media;
+
+    if (!resolvedMedia.image && token.tokenUri?.raw) {
+      try {
+        const resolved = await resolveMetadata(
+          tokenId,
+          token.tokenUri.raw,
+          cacheTtls.metadata
+        );
+        resolvedMedia = resolved.media;
+      } catch {
+        // Fall back to object-derived metadata if fetch fails.
+      }
+    }
+
+    return { token, resolvedMedia };
+  } catch {
+    return null;
+  }
+}
+
+export async function buildTokenInspectorMetadata(options: {
+  tokenId: string;
+  searchParams?: Record<string, string | string[] | undefined>;
+  shortSlug?: string;
+}) {
+  const { tokenId, searchParams, shortSlug } = options;
+  const chainId = getChainIdFromSearchParams(searchParams);
+  const baseUrl = getBaseUrl();
+  const canonicalPath = shortSlug ? `/token/t/${shortSlug}` : `/token/${tokenId}`;
+  const canonicalUrl = buildAbsoluteUrl(baseUrl, canonicalPath, chainId);
+  const ogData = await resolveTokenOgData(tokenId, chainId);
+  const resolvedImage = ogData?.resolvedMedia?.image ?? null;
+  const tokenTitle =
+    ogData?.token?.title ?? ogData?.token?.name ?? `Token ${tokenId}`;
+  const description =
+    ogData?.token?.description ?? "Read-only provenance inspection.";
+
+  return {
+    title: `cubixles_ — ${tokenTitle}`,
+    description,
+    openGraph: {
+      title: `cubixles_ — ${tokenTitle}`,
+      description,
+      url: canonicalUrl,
+      images: resolvedImage ? [{ url: resolvedImage }] : [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `cubixles_ — ${tokenTitle}`,
+      description,
+      images: resolvedImage ? [resolvedImage] : [],
+    },
+    metadataBase: new URL(baseUrl),
+  };
+}
+
+export async function generateMetadata({
+  params,
+  searchParams,
+}: {
+  params: { id: string };
+  searchParams?: Record<string, string | string[] | undefined>;
+}) {
+  return buildTokenInspectorMetadata({ tokenId: params.id, searchParams });
 }
 
 function truncateMiddle(value: string, start = 6, end = 4) {
