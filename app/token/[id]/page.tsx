@@ -9,7 +9,6 @@ import { getNftMetadata } from "../../_lib/alchemy";
 import { getBasePath } from "../../_lib/basePath";
 import { getEnvConfig } from "../../_lib/env";
 import { resolveMetadata, resolveMetadataFromObject } from "../../_lib/metadata";
-import { encodeTokenIdToBase62 } from "../../_lib/shortToken";
 
 export const dynamic = "force-dynamic";
 
@@ -644,9 +643,7 @@ export default async function TokenPage({
     forwardHeaders["x-vercel-protection-bypass"] = bypassHeader;
   }
   const tokenId = params.id;
-  const shortSlug = encodeTokenIdToBase62(tokenId);
-  const cubeViewerPath = shortSlug ? `/m/t/${shortSlug}` : `/m/${tokenId}`;
-  const cubeViewerUrl = `https://www.cubixles.xyz${cubeViewerPath}`;
+  const cubeViewerUrl = `https://www.cubixles.xyz/m/${tokenId}`;
   const chainIdParam =
     typeof searchParams?.chainId === "string" ? searchParams.chainId : undefined;
   const chainIdRaw = chainIdParam ? Number.parseInt(chainIdParam, 10) : NaN;

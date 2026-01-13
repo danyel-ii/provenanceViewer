@@ -1,9 +1,6 @@
 import type { FaceId } from "./landing-provenance";
 import { MINT_AUDIT } from "./mint-audit";
 
-const MINT_AUDIT_VIEWER_URL =
-  "https://www.cubixles.xyz/m/t/A67ZsWkoIhKNmU45juxGwpNQl8oMOgnITDWyJeVLulb";
-
 export type NftMedia = {
   image: string | null;
   animation: string | null;
@@ -46,7 +43,8 @@ export type MintedCube = {
 export const CUBIXLES_MINTED_CUBES: Record<string, MintedCube> = {
   [MINT_AUDIT.tokenId]: {
     tokenId: MINT_AUDIT.tokenId,
-    tokenViewUrl: MINT_AUDIT_VIEWER_URL,
+    tokenViewUrl:
+      "https://www.cubixles.xyz/m/68856407996780796028956744786520837137006152108154744843335376429330318427953",
     mintedAt: "2024-11-14",
     mintedBy: "cubixles_ + curtains",
     network: "Ethereum Mainnet",
@@ -57,7 +55,7 @@ export const CUBIXLES_MINTED_CUBES: Record<string, MintedCube> = {
     references: [
       {
         label: "Token view on cubixles.xyz",
-        url: MINT_AUDIT_VIEWER_URL,
+        url: "https://www.cubixles.xyz/m/68856407996780796028956744786520837137006152108154744843335376429330318427953",
       },
       {
         label: "Spec + provenance journal",
@@ -161,7 +159,7 @@ export const CUBIXLES_MINTED_CUBES: Record<string, MintedCube> = {
           "The cube viewer reels the six faces back into a single proof-of-work, then pins the experience to IPFS before minting.",
         reference: {
           label: "Gallery link",
-          url: MINT_AUDIT_VIEWER_URL,
+          url: "https://www.cubixles.xyz/m/68856407996780796028956744786520837137006152108154744843335376429330318427953",
         },
       },
       {

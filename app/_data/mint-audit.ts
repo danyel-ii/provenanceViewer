@@ -60,7 +60,7 @@ export const MINT_AUDIT = {
   notes: "If floor data is unavailable we display 0; your NFT selection is embedded as provenance.",
   priceMechanic: "Mint cost rises as $LESS supply drops (read the economics at less.ripe.wtf/about).",
   externalUrl:
-    "https://www.cubixles.xyz/m/t/A67ZsWkoIhKNmU45juxGwpNQl8oMOgnITDWyJeVLulb",
+    "https://www.cubixles.xyz/m/68856407996780796028956744786520837137006152108154744843335376429330318427953",
   mappings: [
     {
       label: "Selection",

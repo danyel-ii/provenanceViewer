@@ -12,7 +12,6 @@ import {
 import FallbackImage from "./FallbackImage";
 import CubixlesText from "./CubixlesText";
 import { withBasePath } from "../_lib/basePath";
-import { encodeTokenIdToBase62 } from "../_lib/shortToken";
 
 type TokenMedia = {
   gateway?: string;
@@ -429,11 +428,7 @@ export default function TokenIndexPanel() {
             : displayTitleRaw;
           const imageCandidates = getTokenImageCandidates(token);
           const isHighlighted = index === highlightIndex;
-          const shortSlug = encodeTokenIdToBase62(token.tokenId);
-          const tokenPath = shortSlug
-            ? `/token/t/${shortSlug}`
-            : `/token/${token.tokenId}`;
-          const tokenHref = `${tokenPath}?chainId=${activeChainId}`;
+          const tokenHref = `/token/${token.tokenId}?chainId=${activeChainId}`;
           return (
             <Link
               key={token.tokenId}
