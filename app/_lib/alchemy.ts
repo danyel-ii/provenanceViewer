@@ -30,7 +30,7 @@ type AlchemyNft = {
   tokenUri?: {
     raw?: string;
     gateway?: string;
-  };
+  } | string;
   media?: AlchemyNftMedia[];
   mint?: AlchemyMintInfo;
 };
@@ -92,6 +92,64 @@ export type NormalizedCollectionAggregate = {
 };
 
 const RETRYABLE_STATUSES = new Set([408, 429, 500, 502, 503, 504]);
+
+function pickString(value: unknown): string | undefined {
+  if (typeof value !== "string") {
+    return undefined;
+  }
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+}
+
+function normalizeTokenUri(
+  value: unknown
+): { raw?: string; gateway?: string } | null {
+  if (!value) {
+    return null;
+  }
+  if (typeof value === "string") {
+    const raw = pickString(value);
+    return raw ? { raw } : null;
+  }
+  if (typeof value !== "object") {
+    return null;
+  }
+  const record = value as Record<string, unknown>;
+  const raw = pickString(record.raw);
+  const gateway = pickString(record.gateway);
+  if (!raw && !gateway) {
+    return null;
+  }
+  return { raw, gateway };
+}
+
+function parseNumber(value: unknown): number | undefined {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+  if (typeof value === "string") {
+    const parsed = Number.parseInt(value, 10);
+    return Number.isFinite(parsed) ? parsed : undefined;
+  }
+  return undefined;
+}
+
+function normalizeMintInfo(value: unknown): AlchemyMintInfo | null {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+  const record = value as Record<string, unknown>;
+  return {
+    transactionHash:
+      pickString(record.transactionHash) ?? pickString(record.transaction_hash),
+    minterAddress:
+      pickString(record.minterAddress) ??
+      pickString(record.mintAddress) ??
+      pickString(record.mint_address),
+    blockNumber: parseNumber(record.blockNumber),
+    timestamp: pickString(record.timestamp),
+  };
+}
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -197,12 +255,9 @@ export async function getNftsForCollection(
           name: nft.name,
           description: nft.description,
           metadata: nft.metadata ?? nft.raw?.metadata ?? null,
-          tokenUri: nft.tokenUri ??
-            (nft.raw?.tokenUri
-              ? { raw: nft.raw.tokenUri, gateway: undefined }
-              : null),
+          tokenUri: normalizeTokenUri(nft.tokenUri ?? nft.raw?.tokenUri),
           media: nft.media ?? [],
-          mint: nft.mint ?? null,
+          mint: normalizeMintInfo(nft.mint),
         };
       })
       .filter((token): token is NormalizedNft => Boolean(token));
@@ -313,13 +368,9 @@ export async function getNftMetadata(
       name: response.name,
       description: response.description,
       metadata: response.metadata ?? response.raw?.metadata ?? null,
-      tokenUri:
-        response.tokenUri ??
-        (response.raw?.tokenUri
-          ? { raw: response.raw.tokenUri, gateway: undefined }
-          : null),
+      tokenUri: normalizeTokenUri(response.tokenUri ?? response.raw?.tokenUri),
       media: response.media ?? [],
-      mint: response.mint ?? null,
+      mint: normalizeMintInfo(response.mint),
     };
   });
 }

@@ -33,14 +33,18 @@ type TokenApiResponse = {
   title?: string;
   name?: string;
   description?: string;
-  tokenUri: {
-    raw?: string;
-    gateway?: string;
-  } | null;
+  tokenUri:
+    | {
+        raw?: string;
+        gateway?: string;
+      }
+    | string
+    | null;
   media: { gateway?: string; raw?: string; thumbnail?: string; format?: string }[];
   mint: {
     transactionHash?: string;
     minterAddress?: string;
+    mintAddress?: string;
     blockNumber?: number;
     timestamp?: string;
   } | null;
@@ -341,6 +345,32 @@ function getOpenSeaCollectionLink(chainId?: number): string {
     : "https://opensea.io/collection/cubixles";
 }
 
+function getExplorerBaseUrl(chainId?: number): string {
+  return chainId === 8453 ? "https://basescan.org" : "https://etherscan.io";
+}
+
+function buildExplorerAddressUrl(address: string, chainId?: number): string {
+  return `${getExplorerBaseUrl(chainId)}/address/${address}`;
+}
+
+function buildExplorerTokenUrl(
+  contractAddress: string,
+  tokenId: string,
+  chainId?: number
+): string {
+  return `${getExplorerBaseUrl(chainId)}/token/${contractAddress}?a=${tokenId}`;
+}
+
+function resolveTokenUri(value: TokenApiResponse["tokenUri"]): string | null {
+  if (!value) {
+    return null;
+  }
+  if (typeof value === "string") {
+    return value;
+  }
+  return value.raw ?? value.gateway ?? null;
+}
+
 function OpenSeaIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -503,6 +533,7 @@ export default async function TokenPage({
     forwardHeaders["x-vercel-protection-bypass"] = bypassHeader;
   }
   const tokenId = params.id;
+  const cubeViewerUrl = `https://www.cubixles.xyz/m/${tokenId}`;
   const chainIdParam =
     typeof searchParams?.chainId === "string" ? searchParams.chainId : undefined;
   const chainIdRaw = chainIdParam ? Number.parseInt(chainIdParam, 10) : NaN;
@@ -571,6 +602,14 @@ export default async function TokenPage({
             </Link>
           </div>
         </section>
+        <a
+          className="cube-viewer-hud"
+          href={cubeViewerUrl}
+          target="_blank"
+          rel="noreferrer"
+        >
+          View cube
+        </a>
       </main>
     );
   }
@@ -584,6 +623,21 @@ export default async function TokenPage({
   const inferredChainId = networkLabel.includes("base") ? 8453 : 1;
   const activeChainId = chainId ?? inferredChainId;
   const activeOpenSeaUrl = getOpenSeaCollectionLink(activeChainId);
+  const minterAddress =
+    token.mint?.minterAddress ?? token.mint?.mintAddress ?? null;
+  const minterUrl = minterAddress
+    ? buildExplorerAddressUrl(minterAddress, activeChainId)
+    : null;
+  const tokenUriRaw = resolveTokenUri(token.tokenUri);
+  const fallbackMetadataUrl = buildExplorerTokenUrl(
+    token.contractAddress,
+    token.tokenId,
+    activeChainId
+  );
+  const metadataUrl = tokenUriRaw ?? fallbackMetadataUrl;
+  const metadataLabel = tokenUriRaw
+    ? truncateLongValue(tokenUriRaw)
+    : "View on explorer";
 
   const resolvedMedia = token.metadata?.media;
   const shortTokenId = truncateMiddle(token.tokenId);
@@ -694,15 +748,35 @@ export default async function TokenPage({
             <div className="token-detail-row">
               <span className="token-detail-label">Minter</span>
               <span className="token-detail-value">
-                {token.mint?.minterAddress
-                  ? truncateMiddle(token.mint.minterAddress)
-                  : "n/a"}
+                {minterAddress && minterUrl ? (
+                  <a
+                    href={minterUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="token-detail-link"
+                  >
+                    {truncateMiddle(minterAddress)}
+                  </a>
+                ) : (
+                  "n/a"
+                )}
               </span>
             </div>
             <div className="token-detail-row">
               <span className="token-detail-label">Metadata URL</span>
               <span className="token-detail-value">
-                {token.tokenUri?.raw ?? "n/a"}
+                {metadataUrl ? (
+                  <a
+                    href={metadataUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="token-detail-link"
+                  >
+                    {metadataLabel}
+                  </a>
+                ) : (
+                  "n/a"
+                )}
               </span>
             </div>
           </div>
@@ -896,6 +970,14 @@ export default async function TokenPage({
           for holders of this token.
         </p>
       </CollapsiblePanel>
+      <a
+        className="cube-viewer-hud"
+        href={cubeViewerUrl}
+        target="_blank"
+        rel="noreferrer"
+      >
+        View cube
+      </a>
     </main>
   );
 }
