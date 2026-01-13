@@ -59,9 +59,12 @@ export async function GET(
       );
     }
 
-    const resolvedMetadata = token.tokenUri?.raw
+    let resolvedMetadata = token.tokenUri?.raw
       ? await resolveMetadata(tokenId, token.tokenUri.raw, cacheTtls.metadata)
       : resolveMetadataFromObject(tokenId, token.metadata);
+    if (!resolvedMetadata.metadata) {
+      resolvedMetadata = resolveMetadataFromObject(tokenId, token.metadata);
+    }
 
     return NextResponse.json({
       tokenId,

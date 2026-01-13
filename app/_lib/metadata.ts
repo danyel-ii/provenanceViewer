@@ -10,11 +10,13 @@ const IPFS_GATEWAYS = [
 const ARWEAVE_GATEWAYS = ["https://arweave.net/", "https://ar-io.net/"];
 const DEFAULT_METADATA_TIMEOUT_MS = 8000;
 const DEFAULT_METADATA_MAX_BYTES = 1024 * 1024;
+const DEFAULT_METADATA_HOSTS = ["alchemy.mypinata.cloud"];
 const DEFAULT_ALLOWED_HOSTS = [...IPFS_GATEWAYS, ...ARWEAVE_GATEWAYS].map(
   (gateway) => new URL(gateway).hostname.toLowerCase()
 );
 const METADATA_ALLOWED_HOSTS = new Set<string>([
   ...DEFAULT_ALLOWED_HOSTS,
+  ...DEFAULT_METADATA_HOSTS,
   ...parseHostList(process.env.METADATA_ALLOWED_HOSTS),
 ]);
 const METADATA_FETCH_TIMEOUT_MS = parsePositiveInt(

@@ -371,6 +371,20 @@ function resolveTokenUri(value: TokenApiResponse["tokenUri"]): string | null {
   return value.raw ?? value.gateway ?? null;
 }
 
+function getMetadataMinter(metadata: Record<string, unknown> | null): string | null {
+  if (!metadata) {
+    return null;
+  }
+  const provenance = isRecord(metadata.provenance) ? metadata.provenance : null;
+  const candidate = pickString(
+    provenance?.selectedBy as string | undefined,
+    provenance?.selected_by as string | undefined,
+    (metadata.minter as string | undefined) ?? undefined,
+    (metadata.minterAddress as string | undefined) ?? undefined
+  );
+  return candidate ?? null;
+}
+
 function OpenSeaIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -623,8 +637,11 @@ export default async function TokenPage({
   const inferredChainId = networkLabel.includes("base") ? 8453 : 1;
   const activeChainId = chainId ?? inferredChainId;
   const activeOpenSeaUrl = getOpenSeaCollectionLink(activeChainId);
+  const metadataMinter = getMetadataMinter(
+    token.metadata?.resolved ?? token.metadata?.raw ?? null
+  );
   const minterAddress =
-    token.mint?.minterAddress ?? token.mint?.mintAddress ?? null;
+    token.mint?.minterAddress ?? token.mint?.mintAddress ?? metadataMinter ?? null;
   const minterUrl = minterAddress
     ? buildExplorerAddressUrl(minterAddress, activeChainId)
     : null;
