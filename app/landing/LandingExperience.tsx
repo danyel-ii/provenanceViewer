@@ -47,7 +47,7 @@ export default function LandingExperience() {
       <footer className="landing-watermark">
         hat&apos;s off to{" "}
         <a
-          href="https://marjoballabani.me/"
+          href="https://www.paypal.com/paypalme/Ballabani"
           target="_blank"
           rel="noreferrer"
         >

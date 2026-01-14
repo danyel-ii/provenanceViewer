@@ -29,17 +29,6 @@ export default function HelpPage() {
       </section>
 
       <HelpdeskClient />
-
-      <footer className="landing-watermark">
-        hat&apos;s off to{" "}
-        <a
-          href="https://marjoballabani.me/"
-          target="_blank"
-          rel="noreferrer"
-        >
-          https://marjoballabani.me/
-        </a>
-      </footer>
     </main>
   );
 }
