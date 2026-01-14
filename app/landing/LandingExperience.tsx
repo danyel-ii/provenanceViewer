@@ -4,10 +4,12 @@ import CubixlesLogo from "../_components/CubixlesLogo";
 import NotesFlockOverlay from "../_components/NotesFlockOverlay";
 import TokenIndexPanel from "../_components/TokenIndexPanel";
 import DigItOverlay from "../_components/DigItOverlay";
+import PaletteRandomizer from "../_components/PaletteRandomizer";
 
 export default function LandingExperience() {
   return (
     <main className="landing-page landing-home">
+      <PaletteRandomizer />
       <NotesFlockOverlay />
       <section className="landing-header">
         <div className="landing-intro">
