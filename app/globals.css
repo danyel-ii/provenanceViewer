@@ -2279,6 +2279,70 @@ body.notes-docked {
   gap: 12px;
 }
 
+.token-easter-egg {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  align-items: center;
+}
+
+.token-easter-egg-button {
+  appearance: none;
+  width: 64px;
+  height: 84px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: radial-gradient(circle at 40% 20%, rgba(255, 226, 179, 0.3), rgba(8, 10, 16, 0.95));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow:
+    0 12px 26px rgba(0, 0, 0, 0.45),
+    inset 0 0 18px rgba(255, 226, 179, 0.2);
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.token-easter-egg-button:hover {
+  transform: translateY(-1px) scale(1.02);
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow:
+    0 16px 28px rgba(0, 0, 0, 0.5),
+    inset 0 0 22px rgba(255, 226, 179, 0.35);
+}
+
+.token-easter-egg-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+  transform: none;
+  box-shadow:
+    0 10px 18px rgba(0, 0, 0, 0.4),
+    inset 0 0 12px rgba(255, 226, 179, 0.2);
+}
+
+.token-easter-egg-icon {
+  width: 34px;
+  height: 44px;
+}
+
+.token-easter-egg-copy {
+  display: grid;
+  gap: 6px;
+  min-width: min(280px, 100%);
+}
+
+.token-easter-egg-status {
+  margin: 0;
+  font-size: 14px;
+  color: rgba(247, 247, 252, 0.92);
+}
+
+.token-easter-egg-note {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
 .token-provenance-id {
   margin: 6px 0 0;
   font-size: 18px;

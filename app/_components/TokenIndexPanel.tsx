@@ -82,6 +82,105 @@ function uniqueStrings(values: string[]) {
   return Array.from(new Set(values.filter(Boolean)));
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function toFeingehaltLabel(value: unknown): string | null {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return String(value);
+  }
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    return trimmed.length > 0 ? trimmed : null;
+  }
+  return null;
+}
+
+function findFeingehaltKey(record: Record<string, unknown>): string | null {
+  for (const [key, value] of Object.entries(record)) {
+    if (key.trim().toLowerCase() === "feingehalt") {
+      const label = toFeingehaltLabel(value);
+      if (label) {
+        return label;
+      }
+    }
+  }
+  return null;
+}
+
+function extractFeingehaltFromAttributes(attributes: unknown): string | null {
+  if (!attributes) {
+    return null;
+  }
+  const entries = Array.isArray(attributes) ? attributes : [attributes];
+  for (const entry of entries) {
+    if (!isRecord(entry)) {
+      continue;
+    }
+
+    const direct = findFeingehaltKey(entry);
+    if (direct) {
+      return direct;
+    }
+
+    const traitRaw =
+      (entry.trait_type as string | undefined) ??
+      (entry.traitType as string | undefined) ??
+      (entry.type as string | undefined) ??
+      (entry.name as string | undefined);
+
+    if (traitRaw && traitRaw.trim().toLowerCase() === "feingehalt") {
+      const label = toFeingehaltLabel(
+        entry.value ?? entry.val ?? entry.amount
+      );
+      if (label) {
+        return label;
+      }
+    }
+  }
+  return null;
+}
+
+function pickFeingehaltValue(metadata: Record<string, unknown> | null): string | null {
+  if (!metadata) {
+    return null;
+  }
+
+  const direct = findFeingehaltKey(metadata);
+  if (direct) {
+    return direct;
+  }
+
+  const properties = isRecord(metadata.properties) ? metadata.properties : null;
+  if (properties) {
+    const propDirect = findFeingehaltKey(properties);
+    if (propDirect) {
+      return propDirect;
+    }
+    const propAttrs = extractFeingehaltFromAttributes(
+      properties.attributes ?? properties.traits
+    );
+    if (propAttrs) {
+      return propAttrs;
+    }
+  }
+
+  return extractFeingehaltFromAttributes(metadata.attributes ?? metadata.traits);
+}
+
+function parseFeingehaltSortValue(label: string | null): number | null {
+  if (!label) {
+    return null;
+  }
+  const match = label.replace(/,/g, ".").match(/-?\d+(\.\d+)?/);
+  if (!match) {
+    return null;
+  }
+  const parsed = Number.parseFloat(match[0]);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
 function extractStringValues(value: unknown): string[] {
   if (!value) {
     return [];
@@ -325,6 +424,34 @@ export default function TokenIndexPanel() {
       ? `Loaded ${tokens.length} tokens. More pages available.`
       : `Loaded ${tokens.length} tokens. End of list.`;
   }, [status, isAllMode, truncated, pages, tokens.length, hasMore]);
+
+  const displayTokens = useMemo(() => {
+    const enriched = tokens.map((token) => {
+      const feingehaltLabel = pickFeingehaltValue(token.metadata ?? null);
+      return {
+        token,
+        feingehaltLabel,
+        feingehaltSort: parseFeingehaltSortValue(feingehaltLabel),
+      };
+    });
+
+    return enriched.sort((a, b) => {
+      if (a.feingehaltSort === null && b.feingehaltSort === null) {
+        return a.token.tokenId.localeCompare(b.token.tokenId);
+      }
+      if (a.feingehaltSort === null) {
+        return 1;
+      }
+      if (b.feingehaltSort === null) {
+        return -1;
+      }
+      if (a.feingehaltSort === b.feingehaltSort) {
+        return a.token.tokenId.localeCompare(b.token.tokenId);
+      }
+      return b.feingehaltSort - a.feingehaltSort;
+    });
+  }, [tokens]);
+
   const highlightIndex = hoveredIndex ?? activeIndex;
 
   return (
@@ -419,7 +546,8 @@ export default function TokenIndexPanel() {
       {error && <p className="token-index-error">Error: {error}</p>}
 
       <div className="token-index-carousel">
-        {tokens.map((token, index) => {
+        {displayTokens.map((entry, index) => {
+          const { token, feingehaltLabel } = entry;
           const shortTokenId = truncateMiddle(token.tokenId);
           const displayTitleRaw =
             token.title ?? token.name ?? `Token ${token.tokenId}`;
@@ -455,11 +583,9 @@ export default function TokenIndexPanel() {
               <p className="token-index-title" title={displayTitleRaw}>
                 <CubixlesText text={displayTitle} />
               </p>
-              {token.description && (
-                <p className="token-index-copy">
-                  <CubixlesText text={token.description} />
-                </p>
-              )}
+              <p className="token-index-copy">
+                Feingehalt {feingehaltLabel ?? "n/a"}
+              </p>
               <div className="token-index-meta">
                 <span>Minted {formatTimestamp(token.mint?.timestamp)}</span>
                 <span>

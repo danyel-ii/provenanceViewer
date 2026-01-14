@@ -15,6 +15,8 @@ export type EnvConfig = {
   cacheTtls: CacheTtls;
 };
 
+export type TokenStandard = "ERC721" | "ERC1155";
+
 const cachedConfigByChain = new Map<string, EnvConfig>();
 
 const NETWORK_BY_CHAIN_ID: Record<number, string> = {
@@ -133,4 +135,12 @@ export function getAlchemyNftBaseUrl(chainIdOverride?: number): string {
 export function getAlchemyRpcUrl(chainIdOverride?: number): string {
   const { network, alchemyKey } = getEnvConfig(chainIdOverride);
   return `https://${network}.g.alchemy.com/v2/${alchemyKey}`;
+}
+
+export function getTokenStandard(): TokenStandard {
+  const raw = readEnv("CUBIXLES_TOKEN_STANDARD") ?? readEnv("TOKEN_STANDARD");
+  if (raw && raw.toUpperCase() === "ERC1155") {
+    return "ERC1155";
+  }
+  return "ERC721";
 }

@@ -136,3 +136,17 @@ export async function getCachedJson<T>(
   await adapter.set(key, JSON.stringify(fresh), ttlSeconds);
   return fresh;
 }
+
+export async function getCacheValue(key: string): Promise<string | null> {
+  const adapter = await getCacheAdapter();
+  return adapter.get(key);
+}
+
+export async function setCacheValue(
+  key: string,
+  value: string,
+  ttlSeconds: number
+): Promise<void> {
+  const adapter = await getCacheAdapter();
+  await adapter.set(key, value, ttlSeconds);
+}

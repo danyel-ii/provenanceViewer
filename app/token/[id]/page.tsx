@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import CollapsiblePanel from "../../_components/CollapsiblePanel";
 import CubixlesText from "../../_components/CubixlesText";
 import FallbackImage from "../../_components/FallbackImage";
+import TokenEasterEggPanel from "../../_components/TokenEasterEggPanel";
 import TokenVerifyPanel from "../../_components/TokenVerifyPanel";
 import { getNftMetadata } from "../../_lib/alchemy";
 import { getBasePath } from "../../_lib/basePath";
@@ -1073,17 +1074,7 @@ export default async function TokenPage({
       </CollapsiblePanel>
 
       <TokenVerifyPanel tokenId={token.tokenId} chainId={chainId} />
-
-      <CollapsiblePanel
-        eyebrow="Collector unlock"
-        title="Owner-only experience"
-        subhead="Reserved for token-gated easter eggs."
-      >
-        <p className="panel-body-text">
-          When ownership checks are enabled, this panel will unlock a private experience
-          for holders of this token.
-        </p>
-      </CollapsiblePanel>
+      <TokenEasterEggPanel tokenId={token.tokenId} chainId={activeChainId} />
       <a
         className="cube-viewer-hud"
         href={cubeViewerUrl}

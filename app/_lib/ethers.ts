@@ -9,6 +9,11 @@ const ERC721_ABI = [
   "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)",
 ];
 
+const ERC1155_ABI = [
+  "function balanceOf(address account, uint256 id) view returns (uint256)",
+  "function uri(uint256 id) view returns (string)",
+];
+
 const TRANSFER_EVENT = "Transfer";
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
@@ -40,6 +45,11 @@ export function getErc721Interface() {
 export function getErc721Contract(chainIdOverride?: number) {
   const { contractAddress } = getEnvConfig(chainIdOverride);
   return new Contract(contractAddress, ERC721_ABI, getProvider(chainIdOverride));
+}
+
+export function getErc1155Contract(chainIdOverride?: number) {
+  const { contractAddress } = getEnvConfig(chainIdOverride);
+  return new Contract(contractAddress, ERC1155_ABI, getProvider(chainIdOverride));
 }
 
 export async function getMintedTokenIdsFromReceipt(txHash: string, chainIdOverride?: number) {
@@ -90,4 +100,13 @@ export async function readOwnerOf(tokenId: string, chainIdOverride?: number) {
 export async function readTokenUri(tokenId: string, chainIdOverride?: number) {
   const contract = getErc721Contract(chainIdOverride);
   return contract.tokenURI(tokenId);
+}
+
+export async function readBalanceOf(
+  address: string,
+  tokenId: string,
+  chainIdOverride?: number
+) {
+  const contract = getErc1155Contract(chainIdOverride);
+  return contract.balanceOf(address, tokenId);
 }
