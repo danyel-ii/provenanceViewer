@@ -221,6 +221,27 @@ function parseFeingehaltSortValue(label: string | null): number | null {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+function formatFeingehaltDisplay(
+  label: string | null,
+  numericValue: number | null
+): string | null {
+  if (!label) {
+    return null;
+  }
+  const trimmed = label.trim();
+  if (!trimmed) {
+    return null;
+  }
+  if (!/^-?[\d.,]+$/.test(trimmed) || numericValue === null) {
+    return trimmed;
+  }
+  const factor = 10_000;
+  const truncated = Math.trunc(numericValue * factor) / factor;
+  const fixed = truncated.toFixed(4);
+  const stripped = fixed.replace(/\.?0+$/, "");
+  return stripped.replace(".", ",");
+}
+
 function extractStringValues(value: unknown): string[] {
   if (!value) {
     return [];
@@ -468,10 +489,16 @@ export default function TokenIndexPanel() {
   const displayTokens = useMemo(() => {
     const enriched = tokens.map((token) => {
       const feingehaltLabel = pickFeingehaltValue(token.metadata ?? null);
+      const feingehaltSort = parseFeingehaltSortValue(feingehaltLabel);
+      const feingehaltDisplay = formatFeingehaltDisplay(
+        feingehaltLabel,
+        feingehaltSort
+      );
       return {
         token,
         feingehaltLabel,
-        feingehaltSort: parseFeingehaltSortValue(feingehaltLabel),
+        feingehaltSort,
+        feingehaltDisplay,
       };
     });
 
@@ -586,7 +613,7 @@ export default function TokenIndexPanel() {
 
       <div className="token-index-carousel">
         {displayTokens.map((entry, index) => {
-          const { token, feingehaltLabel } = entry;
+          const { token, feingehaltDisplay } = entry;
           const shortTokenId = truncateMiddle(token.tokenId);
           const displayTitleRaw =
             token.title ?? token.name ?? `Token ${token.tokenId}`;
@@ -622,8 +649,11 @@ export default function TokenIndexPanel() {
               <p className="token-index-title" title={displayTitleRaw}>
                 <CubixlesText text={displayTitle} />
               </p>
-              <p className="token-index-copy">
-                Feingehalt {feingehaltLabel ?? "n/a"}
+              <p className="token-index-copy token-index-feingehalt">
+                <span className="token-index-feingehalt-label">Feingehalt</span>{" "}
+                <span className="token-index-feingehalt-value">
+                  {feingehaltDisplay ?? "n/a"}
+                </span>
               </p>
               <div className="token-index-meta">
                 <span>Minted {formatTimestamp(token.mint?.timestamp)}</span>

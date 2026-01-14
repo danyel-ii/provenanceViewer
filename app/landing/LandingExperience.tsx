@@ -43,6 +43,17 @@ export default function LandingExperience() {
       <section id="token-list" className="landing-token-list">
         <TokenIndexPanel />
       </section>
+
+      <footer className="landing-watermark">
+        hat&apos;s off to{" "}
+        <a
+          href="https://marjoballabani.me/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          https://marjoballabani.me/
+        </a>
+      </footer>
     </main>
   );
 }
