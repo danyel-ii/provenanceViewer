@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import CollapsiblePanel from "../../_components/CollapsiblePanel";
 import CubixlesText from "../../_components/CubixlesText";
 import FallbackImage from "../../_components/FallbackImage";
+import PaletteRandomizer from "../../_components/PaletteRandomizer";
 import TokenVerifyPanel from "../../_components/TokenVerifyPanel";
 import { getNftMetadata } from "../../_lib/alchemy";
 import { getBasePath } from "../../_lib/basePath";
@@ -667,7 +668,8 @@ export default async function TokenPage({
 
   if (!tokenRes.ok) {
     return (
-      <main className="landing-page token-page">
+      <main className="landing-page token-page token-page-neo">
+        <PaletteRandomizer />
         <section className="provenance-panel">
           <p className="panel-eyebrow">Token lookup</p>
           <h1 className="panel-title" title={tokenId}>
@@ -765,7 +767,8 @@ export default async function TokenPage({
   );
 
   return (
-    <main className="landing-page token-page">
+    <main className="landing-page token-page token-page-neo">
+      <PaletteRandomizer />
       <CollapsiblePanel
         eyebrow="Token overview"
         title={<CubixlesText text={displayTitle} />}

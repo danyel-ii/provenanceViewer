@@ -10,48 +10,38 @@ type PaletteManifestEntry = {
   used_hex_colors?: string[];
 };
 
-const FALLBACK_COLORS = ["#66D9EF", "#FFD93D", "#FF6B9D", "#A8E6CF"];
-const IGNORED_HEX = new Set(["#000000", "#000000FF"]);
+const DEFAULT_PALETTE = {
+  id: "EA7B7BD253539E3B3BFFEAD3",
+  colors: ["#EA7B7B", "#D25353", "#9E3B3B", "#FFEAD3"],
+};
+const BLACK = "#000000";
+const WHITE = "#FFFFFF";
+const NEUTRAL_HEX = new Set([BLACK, WHITE]);
 
 function normalizeHex(value: string) {
-  const trimmed = value.trim().toUpperCase();
-  if (!trimmed.startsWith("#")) {
-    return `#${trimmed}`;
+  const trimmed = value.trim().replace("#", "").toUpperCase();
+  if (!trimmed) {
+    return "";
   }
-  return trimmed;
+  if (trimmed.length === 3) {
+    return `#${trimmed
+      .split("")
+      .map((channel) => `${channel}${channel}`)
+      .join("")}`;
+  }
+  if (trimmed.length >= 6) {
+    return `#${trimmed.slice(0, 6)}`;
+  }
+  return `#${trimmed.padEnd(6, "0")}`;
 }
 
 function hexToRgb(hex: string) {
   const normalized = normalizeHex(hex).replace("#", "");
-  if (normalized.length === 3) {
-    const r = parseInt(normalized[0] + normalized[0], 16);
-    const g = parseInt(normalized[1] + normalized[1], 16);
-    const b = parseInt(normalized[2] + normalized[2], 16);
-    return { r, g, b };
-  }
   const value = normalized.padEnd(6, "0");
   const r = parseInt(value.slice(0, 2), 16);
   const g = parseInt(value.slice(2, 4), 16);
   const b = parseInt(value.slice(4, 6), 16);
   return { r, g, b };
-}
-
-function rgbToHex({ r, g, b }: { r: number; g: number; b: number }) {
-  const clamp = (value: number) => Math.max(0, Math.min(255, Math.round(value)));
-  return `#${[r, g, b]
-    .map((value) => clamp(value).toString(16).padStart(2, "0"))
-    .join("")}`.toUpperCase();
-}
-
-function mixColors(a: string, b: string, amount: number) {
-  const safeAmount = Math.max(0, Math.min(1, amount));
-  const rgbA = hexToRgb(a);
-  const rgbB = hexToRgb(b);
-  return rgbToHex({
-    r: rgbA.r + (rgbB.r - rgbA.r) * safeAmount,
-    g: rgbA.g + (rgbB.g - rgbA.g) * safeAmount,
-    b: rgbA.b + (rgbB.b - rgbA.b) * safeAmount,
-  });
 }
 
 function relativeLuminance(hex: string) {
@@ -63,43 +53,53 @@ function relativeLuminance(hex: string) {
   return 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
 }
 
-function ensureReadableBackground(color: string, minLuminance = 0.35) {
-  const lum = relativeLuminance(color);
-  if (lum >= minLuminance) {
-    return color;
-  }
-  return mixColors(color, "#FFFFFF", 0.6);
+function contrastRatio(a: string, b: string) {
+  const lumA = relativeLuminance(a);
+  const lumB = relativeLuminance(b);
+  const lighter = Math.max(lumA, lumB);
+  const darker = Math.min(lumA, lumB);
+  return (lighter + 0.05) / (darker + 0.05);
 }
 
-function ensureLightBackground(color: string, minLuminance = 0.75) {
-  const lum = relativeLuminance(color);
-  if (lum >= minLuminance) {
-    return color;
-  }
-  return mixColors(color, "#FFFFFF", 0.72);
+function pickOnColor(background: string) {
+  return contrastRatio(background, BLACK) >= contrastRatio(background, WHITE)
+    ? BLACK
+    : WHITE;
 }
 
 function pickPaletteColors(entry: PaletteManifestEntry) {
   const raw = entry.hex_colors?.length
     ? entry.hex_colors
     : entry.used_hex_colors ?? [];
-  const normalized = raw
-    .map((value) => normalizeHex(value))
-    .filter((value) => value && !IGNORED_HEX.has(value));
-  return Array.from(new Set(normalized));
+  const normalized = raw.map((value) => normalizeHex(value)).filter(Boolean);
+  const unique = Array.from(new Set(normalized));
+  const paletteColors = unique.filter((value) => !NEUTRAL_HEX.has(value));
+  return paletteColors.length ? paletteColors : unique;
+}
+
+function ensurePaletteSize(colors: string[], size = 4) {
+  if (!colors.length) {
+    return [...DEFAULT_PALETTE.colors];
+  }
+  const resolved = [...colors];
+  let index = 0;
+  while (resolved.length < size) {
+    resolved.push(resolved[index % resolved.length]);
+    index += 1;
+  }
+  return resolved.slice(0, size);
 }
 
 function pickRandomPalette(entries: PaletteManifestEntry[]) {
   if (!entries.length) {
-    return { paletteId: "fallback", colors: FALLBACK_COLORS };
+    return { paletteId: DEFAULT_PALETTE.id, colors: [...DEFAULT_PALETTE.colors] };
   }
   const entry = entries[Math.floor(Math.random() * entries.length)];
-  const colors = pickPaletteColors(entry);
-  const resolved =
-    colors.length >= 4
-      ? colors.slice(0, 4)
-      : [...colors, ...FALLBACK_COLORS].slice(0, 4);
-  return { paletteId: entry.palette_id ?? "random", colors: resolved };
+  const colors = ensurePaletteSize(pickPaletteColors(entry));
+  if (!colors.length) {
+    return { paletteId: DEFAULT_PALETTE.id, colors: [...DEFAULT_PALETTE.colors] };
+  }
+  return { paletteId: entry.palette_id ?? DEFAULT_PALETTE.id, colors };
 }
 
 export default function PaletteRandomizer() {
@@ -110,51 +110,94 @@ export default function PaletteRandomizer() {
       if (cancelled) {
         return;
       }
-      const container = document.querySelector<HTMLElement>(".landing-home");
-      if (!container) {
+      const containers = Array.from(
+        document.querySelectorAll<HTMLElement>(".landing-home, .token-page-neo")
+      );
+      if (!containers.length) {
         return;
       }
 
       const colors = palette.colors;
-      const lightest = colors.reduce((current, next) =>
-        relativeLuminance(next) > relativeLuminance(current) ? next : current
+      const sortedByLuminance = [...colors].sort(
+        (a, b) => relativeLuminance(a) - relativeLuminance(b)
       );
+      const bg = sortedByLuminance[sortedByLuminance.length - 1];
+      const surface =
+        sortedByLuminance.length > 1
+          ? sortedByLuminance[sortedByLuminance.length - 2]
+          : bg;
+      const gridCandidates = colors.filter((color) => color !== bg);
+      const gridSource = gridCandidates.length ? gridCandidates : colors;
+      const grid = gridSource.reduce((closest, next) => {
+        const currentDelta = Math.abs(
+          relativeLuminance(closest) - relativeLuminance(bg)
+        );
+        const nextDelta = Math.abs(relativeLuminance(next) - relativeLuminance(bg));
+        return nextDelta < currentDelta ? next : closest;
+      });
 
-      const bg = ensureLightBackground(lightest);
-      const surface = mixColors(bg, "#FFFFFF", 0.35);
+      const primary = colors[0] ?? bg;
+      const secondary = colors[1] ?? primary;
+      const accent = colors[2] ?? secondary;
+      const mint = colors[3] ?? accent;
 
-      const primary = ensureReadableBackground(colors[0] ?? FALLBACK_COLORS[0]);
-      const secondary = ensureReadableBackground(colors[1] ?? FALLBACK_COLORS[1]);
-      const accent = ensureReadableBackground(colors[2] ?? FALLBACK_COLORS[2]);
-      const mint = ensureReadableBackground(colors[3] ?? FALLBACK_COLORS[3]);
+      const text = (() => {
+        const blackScore = Math.min(
+          contrastRatio(bg, BLACK),
+          contrastRatio(surface, BLACK)
+        );
+        const whiteScore = Math.min(
+          contrastRatio(bg, WHITE),
+          contrastRatio(surface, WHITE)
+        );
+        return blackScore >= whiteScore ? BLACK : WHITE;
+      })();
 
-      const gridBase = colors.reduce((current, next) =>
-        relativeLuminance(next) < relativeLuminance(current) ? next : current
-      );
-      const { r, g, b } = hexToRgb(gridBase);
-      const grid = `rgba(${r}, ${g}, ${b}, 0.08)`;
+      const border = text;
+      const muted = text;
+      const onSurface = pickOnColor(surface);
+      const onPrimary = pickOnColor(primary);
+      const onSecondary = pickOnColor(secondary);
+      const onAccent = pickOnColor(accent);
+      const onMint = pickOnColor(mint);
 
-      container.style.setProperty("--neo-bg", bg);
-      container.style.setProperty("--neo-surface", surface);
-      container.style.setProperty("--neo-primary", primary);
-      container.style.setProperty("--neo-secondary", secondary);
-      container.style.setProperty("--neo-accent", accent);
-      container.style.setProperty("--neo-mint", mint);
-      container.style.setProperty("--neo-grid", grid);
-      container.dataset.paletteId = palette.paletteId;
+      containers.forEach((container) => {
+        container.style.setProperty("--neo-bg", bg);
+        container.style.setProperty("--neo-surface", surface);
+        container.style.setProperty("--neo-border", border);
+        container.style.setProperty("--neo-text", text);
+        container.style.setProperty("--neo-muted", muted);
+        container.style.setProperty("--neo-primary", primary);
+        container.style.setProperty("--neo-secondary", secondary);
+        container.style.setProperty("--neo-accent", accent);
+        container.style.setProperty("--neo-mint", mint);
+        container.style.setProperty("--neo-grid", grid);
+        container.style.setProperty("--neo-on-surface", onSurface);
+        container.style.setProperty("--neo-on-primary", onPrimary);
+        container.style.setProperty("--neo-on-secondary", onSecondary);
+        container.style.setProperty("--neo-on-accent", onAccent);
+        container.style.setProperty("--neo-on-mint", onMint);
+        container.dataset.paletteId = palette.paletteId;
+      });
     };
 
     const loadPalette = async () => {
       try {
         const response = await fetch(withBasePath("/palette_outputs/manifest.json"));
         if (!response.ok) {
-          applyPalette({ paletteId: "fallback", colors: FALLBACK_COLORS });
+          applyPalette({
+            paletteId: DEFAULT_PALETTE.id,
+            colors: [...DEFAULT_PALETTE.colors],
+          });
           return;
         }
         const entries = (await response.json()) as PaletteManifestEntry[];
         applyPalette(pickRandomPalette(entries));
       } catch {
-        applyPalette({ paletteId: "fallback", colors: FALLBACK_COLORS });
+        applyPalette({
+          paletteId: DEFAULT_PALETTE.id,
+          colors: [...DEFAULT_PALETTE.colors],
+        });
       }
     };
 
