@@ -97,6 +97,15 @@ function toFeingehaltLabel(value: unknown): string | null {
   return null;
 }
 
+function isFeingehaltTrait(trait: string) {
+  const normalized = trait.trim().toLowerCase();
+  return (
+    normalized === "feingehalt" ||
+    normalized === "total floor snapshot (eth)" ||
+    normalized === "total floor snapshot"
+  );
+}
+
 function findFeingehaltKey(record: Record<string, unknown>): string | null {
   for (const [key, value] of Object.entries(record)) {
     if (key.trim().toLowerCase() === "feingehalt") {
@@ -130,7 +139,7 @@ function extractFeingehaltFromAttributes(attributes: unknown): string | null {
       (entry.type as string | undefined) ??
       (entry.name as string | undefined);
 
-    if (traitRaw && traitRaw.trim().toLowerCase() === "feingehalt") {
+    if (traitRaw && isFeingehaltTrait(traitRaw)) {
       const label = toFeingehaltLabel(
         entry.value ?? entry.val ?? entry.amount
       );
@@ -140,6 +149,26 @@ function extractFeingehaltFromAttributes(attributes: unknown): string | null {
     }
   }
   return null;
+}
+
+function extractFeingehaltFromProvenance(
+  metadata: Record<string, unknown>
+): string | null {
+  const provenanceSummary = isRecord(metadata.provenanceSummary)
+    ? metadata.provenanceSummary
+    : null;
+  const provenance = isRecord(metadata.provenance) ? metadata.provenance : null;
+  const floorSummary =
+    provenance && isRecord(provenance.floorSummary)
+      ? provenance.floorSummary
+      : null;
+  const summaryValue =
+    provenanceSummary?.sumFloorEth ??
+    floorSummary?.sumFloorEth ??
+    provenanceSummary?.sumFloor ??
+    floorSummary?.sumFloor ??
+    null;
+  return toFeingehaltLabel(summaryValue);
 }
 
 function pickFeingehaltValue(
@@ -154,11 +183,20 @@ function pickFeingehaltValue(
     return direct;
   }
 
+  const provenanceLabel = extractFeingehaltFromProvenance(metadata);
+  if (provenanceLabel) {
+    return provenanceLabel;
+  }
+
   const properties = isRecord(metadata.properties) ? metadata.properties : null;
   if (properties) {
     const propDirect = findFeingehaltKey(properties);
     if (propDirect) {
       return propDirect;
+    }
+    const propProvenance = extractFeingehaltFromProvenance(properties);
+    if (propProvenance) {
+      return propProvenance;
     }
     const propAttrs = extractFeingehaltFromAttributes(
       properties.attributes ?? properties.traits
