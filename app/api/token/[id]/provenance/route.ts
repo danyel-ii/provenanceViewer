@@ -18,6 +18,7 @@ import {
 } from "../../../../_lib/provenance";
 import { getMintedTokenIdsFromReceipt } from "../../../../_lib/ethers";
 
+// GET /api/token/:id/provenance returns counts, mintTxHash, disclaimer, and other metadata besides candidates.
 export const dynamic = "force-dynamic";
 
 export async function GET(
@@ -111,6 +112,7 @@ export async function GET(
         ownerOverlap,
       });
 
+      // /api/token/:id/provenance returns metadata counts, mintTxHash, disclaimer, and candidates.
       return {
         tokenId,
         contractAddress,
