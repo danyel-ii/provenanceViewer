@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-const FLOCK_DELAY_MS = 900;
+const FLOCK_DELAY_MS = 1400;
 const MOVE_DURATION_MS = 1800;
 const OVERLAY_FADE_MS = 520;
 const FADE_START_DELAY_MS = 150;

@@ -412,20 +412,39 @@ body.cube-fade-in .landing-home .landing-cube-icon {
 }
 
 .landing-home .notes-overlay {
-  opacity: 0.45;
-  mix-blend-mode: multiply;
+  opacity: 1;
+  mix-blend-mode: normal;
+  z-index: 200;
 }
 
 .landing-home .notes-tile {
   border: 2px solid var(--neo-border);
   box-shadow: 3px 3px 0 var(--neo-border);
-  opacity: 0.4;
+  opacity: 1;
+  filter: grayscale(1) saturate(0.15) brightness(0.92);
+}
+
+.landing-home .notes-overlay.flock .notes-tile {
+  filter: grayscale(0) saturate(1.2) brightness(1);
 }
 
 .landing-home .notes-logo {
-  color: var(--neo-border);
-  opacity: 0.35;
-  text-shadow: none;
+  color: #ff4fd8;
+  opacity: 1;
+  -webkit-text-stroke: 1.5px rgba(8, 8, 10, 0.95);
+  text-shadow:
+    0 0 6px rgba(8, 8, 10, 0.7),
+    0 0 16px rgba(8, 8, 10, 0.55),
+    0 0 28px rgba(8, 8, 10, 0.4),
+    0 0 12px rgba(255, 79, 216, 0.7),
+    0 0 26px rgba(255, 79, 216, 0.55),
+    0 0 48px rgba(255, 79, 216, 0.35);
+}
+
+@media (max-width: 700px) {
+  .landing-home .notes-logo {
+    transform: translateY(-6vh);
+  }
 }
 
 .landing-home .landing-watermark {
@@ -2370,7 +2389,8 @@ body.cube-fade-in .landing-home .landing-cube-icon {
   transform: translate3d(-50%, -50%, 0) rotate(var(--rotation));
   transition:
     transform 1.8s cubic-bezier(0.4, 0, 1, 1),
-    opacity 1.3s ease-in;
+    opacity 1.3s ease-in,
+    filter 1.6s ease;
   transition-delay: var(--delay);
   will-change: transform, opacity;
 }
@@ -2418,7 +2438,7 @@ body.cube-fade-in .landing-home .landing-cube-icon {
     )
     scale(0.12)
     rotate(var(--rotation));
-  opacity: 0.85;
+  opacity: 1;
 }
 
 .notes-overlay.dock {
@@ -2440,7 +2460,7 @@ body.notes-docked {
   left: 0;
   width: 36px;
   height: 36px;
-  z-index: 20;
+  z-index: 120;
   padding: 3px;
   border-radius: 8px;
   border: 1px solid rgba(0, 0, 0, 0.45);
