@@ -22,12 +22,23 @@ type CubeFaces = {
 
 const ROLL_DURATION_MS = 760;
 const CUBE_TILT = { x: -22, y: 32 };
+const MOVE_STEP = 22;
+const DEPTH_STEP = 70;
+const POSITION_LIMITS = {
+  x: 140,
+  y: 140,
+  z: 280,
+};
 
 function truncateMiddle(value: string, start = 6, end = 4) {
   if (value.length <= start + end + 3) {
     return value;
   }
   return `${value.slice(0, start)}...${value.slice(-end)}`;
+}
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
 }
 
 function resolveGatewayUrl(value: string): string {
@@ -97,6 +108,7 @@ export default function PaperCubeViewer({
 }: PaperCubeViewerProps) {
   const [unfolded, setUnfolded] = useState(false);
   const [rotation, setRotation] = useState({ x: 0, y: 0 });
+  const [position, setPosition] = useState({ x: 0, y: 0, z: 0 });
   const [rollDirection, setRollDirection] = useState<RollDirection | null>(null);
   const [isRolling, setIsRolling] = useState(false);
 
@@ -139,6 +151,36 @@ export default function PaperCubeViewer({
           return prev;
       }
     });
+    setPosition((prev) => {
+      switch (direction) {
+        case "up":
+          return {
+            x: prev.x,
+            y: clamp(prev.y - MOVE_STEP, -POSITION_LIMITS.y, POSITION_LIMITS.y),
+            z: clamp(prev.z - DEPTH_STEP, -POSITION_LIMITS.z, POSITION_LIMITS.z),
+          };
+        case "down":
+          return {
+            x: prev.x,
+            y: clamp(prev.y + MOVE_STEP, -POSITION_LIMITS.y, POSITION_LIMITS.y),
+            z: clamp(prev.z + DEPTH_STEP, -POSITION_LIMITS.z, POSITION_LIMITS.z),
+          };
+        case "left":
+          return {
+            x: clamp(prev.x - MOVE_STEP, -POSITION_LIMITS.x, POSITION_LIMITS.x),
+            y: prev.y,
+            z: prev.z,
+          };
+        case "right":
+          return {
+            x: clamp(prev.x + MOVE_STEP, -POSITION_LIMITS.x, POSITION_LIMITS.x),
+            y: prev.y,
+            z: prev.z,
+          };
+        default:
+          return prev;
+      }
+    });
     window.setTimeout(() => {
       setIsRolling(false);
       setRollDirection(null);
@@ -174,6 +216,11 @@ export default function PaperCubeViewer({
     "--cube-rotate-y": `${rotation.y}deg`,
     "--cube-tilt-x": `${CUBE_TILT.x}deg`,
     "--cube-tilt-y": `${CUBE_TILT.y}deg`,
+    "--cube-offset-x": `${position.x}px`,
+    "--cube-offset-y": `${position.y}px`,
+    "--cube-depth": `${position.z}px`,
+    "--cube-shadow-scale": clamp(1 + position.z / 500, 0.7, 1.35),
+    "--cube-shadow-opacity": clamp(0.4 + position.z / 700, 0.22, 0.85),
   } as CSSProperties;
   const truncatedTokenId = truncateMiddle(cube.tokenId);
 
