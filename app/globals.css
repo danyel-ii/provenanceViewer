@@ -431,10 +431,11 @@ body.cube-fade-in .landing-home .landing-cube-icon {
 .landing-home .notes-logo {
   color: #ff4fd8;
   opacity: 1;
-  -webkit-text-stroke: 1.5px rgba(245, 241, 232, 0.95);
+  -webkit-text-stroke: 1.5px rgba(8, 8, 10, 0.95);
   text-shadow:
-    0 0 6px rgba(245, 241, 232, 0.75),
-    0 0 16px rgba(245, 241, 232, 0.55),
+    0 0 6px rgba(8, 8, 10, 0.7),
+    0 0 16px rgba(8, 8, 10, 0.55),
+    0 0 28px rgba(8, 8, 10, 0.4),
     0 0 12px rgba(255, 79, 216, 0.7),
     0 0 26px rgba(255, 79, 216, 0.55),
     0 0 48px rgba(255, 79, 216, 0.35);
