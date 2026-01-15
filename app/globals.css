@@ -2446,7 +2446,7 @@ body.notes-docked {
   left: 0;
   width: 36px;
   height: 36px;
-  z-index: 20;
+  z-index: 120;
   padding: 3px;
   border-radius: 8px;
   border: 1px solid rgba(0, 0, 0, 0.45);
