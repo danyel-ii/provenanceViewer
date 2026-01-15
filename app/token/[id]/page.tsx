@@ -2,6 +2,7 @@ import Link from "next/link";
 import { headers } from "next/headers";
 
 import CollapsiblePanel from "../../_components/CollapsiblePanel";
+import CopyButton from "../../_components/CopyButton";
 import CubixlesText from "../../_components/CubixlesText";
 import FallbackImage from "../../_components/FallbackImage";
 import PaletteRandomizer from "../../_components/PaletteRandomizer";
@@ -450,6 +451,10 @@ function buildExplorerAddressUrl(address: string, chainId?: number): string {
   return `${getExplorerBaseUrl(chainId)}/address/${address}`;
 }
 
+function buildExplorerTxUrl(txHash: string, chainId?: number): string {
+  return `${getExplorerBaseUrl(chainId)}/tx/${txHash}`;
+}
+
 function buildExplorerTokenUrl(
   contractAddress: string,
   tokenId: string,
@@ -743,6 +748,11 @@ export default async function TokenPage({
   const minterUrl = minterAddress
     ? buildExplorerAddressUrl(minterAddress, activeChainId)
     : null;
+  const contractExplorerUrl = token.contractAddress
+    ? buildExplorerAddressUrl(token.contractAddress, activeChainId)
+    : null;
+  const mintTxHash = token.mint?.transactionHash ?? null;
+  const mintTxUrl = mintTxHash ? buildExplorerTxUrl(mintTxHash, activeChainId) : null;
   const tokenUriRaw = resolveTokenUri(token.tokenUri);
   const fallbackMetadataUrl = buildExplorerTokenUrl(
     token.contractAddress,
@@ -813,8 +823,25 @@ export default async function TokenPage({
             </div>
             <div className="token-detail-row">
               <span className="token-detail-label">Contract</span>
-              <span className="token-detail-value">
-                {truncateMiddle(token.contractAddress)}
+              <span className="token-detail-value token-detail-actions">
+                {contractExplorerUrl ? (
+                  <a
+                    href={contractExplorerUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="token-detail-link"
+                  >
+                    {truncateMiddle(token.contractAddress)}
+                  </a>
+                ) : (
+                  "n/a"
+                )}
+                {token.contractAddress ? (
+                  <CopyButton
+                    value={token.contractAddress}
+                    label="Copy contract address"
+                  />
+                ) : null}
               </span>
             </div>
             <div className="token-detail-row token-chain-toggle">
@@ -849,10 +876,25 @@ export default async function TokenPage({
             </div>
             <div className="token-detail-row">
               <span className="token-detail-label">Mint tx</span>
-              <span className="token-detail-value">
-                {token.mint?.transactionHash
-                  ? truncateMiddle(token.mint.transactionHash)
-                  : "n/a"}
+              <span className="token-detail-value token-detail-actions">
+                {mintTxUrl ? (
+                  <a
+                    href={mintTxUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="token-detail-link"
+                  >
+                    {truncateMiddle(mintTxHash ?? "")}
+                  </a>
+                ) : (
+                  "n/a"
+                )}
+                {mintTxHash ? (
+                  <CopyButton
+                    value={mintTxHash}
+                    label="Copy mint transaction hash"
+                  />
+                ) : null}
               </span>
             </div>
             <div className="token-detail-row">
