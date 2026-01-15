@@ -36,7 +36,7 @@ function buildViewerUrl(baseUrl: string, tokenId: string, shortSlug?: string) {
   return new URL(withBasePath(path), baseUrl).toString();
 }
 
-export async function buildTokenViewerTwoMetadata(
+async function buildTokenViewerTwoMetadata(
   tokenId: string,
   shortSlug?: string
 ) {
