@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type CSSProperties } from "react";
 
 import type { MintedCube, CubeProvenanceNFT } from "../_data/minted-cube";
 
@@ -21,6 +21,14 @@ type CubeFaces = {
 };
 
 const ROLL_DURATION_MS = 760;
+const CUBE_TILT = { x: -22, y: 32 };
+
+function truncateMiddle(value: string, start = 6, end = 4) {
+  if (value.length <= start + end + 3) {
+    return value;
+  }
+  return `${value.slice(0, start)}...${value.slice(-end)}`;
+}
 
 function resolveGatewayUrl(value: string): string {
   if (value.startsWith("ipfs://") || value.toLowerCase().startsWith("ipfs://")) {
@@ -164,7 +172,10 @@ export default function PaperCubeViewer({
   const cubeStyle = {
     "--cube-rotate-x": `${rotation.x}deg`,
     "--cube-rotate-y": `${rotation.y}deg`,
-  } as React.CSSProperties;
+    "--cube-tilt-x": `${CUBE_TILT.x}deg`,
+    "--cube-tilt-y": `${CUBE_TILT.y}deg`,
+  } as CSSProperties;
+  const truncatedTokenId = truncateMiddle(cube.tokenId);
 
   return (
     <div className={`paper-viewer-shell${unfolded ? " is-unfolded" : ""}`}>
@@ -176,8 +187,8 @@ export default function PaperCubeViewer({
       <header className="paper-viewer-header">
         <div>
           <p className="paper-viewer-eyebrow">Token viewer 02</p>
-          <h1 className="paper-viewer-title">
-            cubixles_ #{cube.tokenId}
+          <h1 className="paper-viewer-title" title={cube.tokenId}>
+            cubixles_ #{truncatedTokenId}
           </h1>
           <p className="paper-viewer-subhead">
             The cube unwraps from paper into a full-sheet field. Roll it with
@@ -185,7 +196,7 @@ export default function PaperCubeViewer({
           </p>
           {isMismatch && (
             <p className="paper-viewer-note">
-              Showing the verified cube for {cube.tokenId} because that is the
+              Showing the verified cube for {truncatedTokenId} because that is the
               minted token at this index.
             </p>
           )}

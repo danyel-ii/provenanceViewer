@@ -431,10 +431,19 @@ body.cube-fade-in .landing-home .landing-cube-icon {
 .landing-home .notes-logo {
   color: #ff4fd8;
   opacity: 1;
+  -webkit-text-stroke: 1.5px rgba(245, 241, 232, 0.95);
   text-shadow:
+    0 0 6px rgba(245, 241, 232, 0.75),
+    0 0 16px rgba(245, 241, 232, 0.55),
     0 0 12px rgba(255, 79, 216, 0.7),
     0 0 26px rgba(255, 79, 216, 0.55),
     0 0 48px rgba(255, 79, 216, 0.35);
+}
+
+@media (max-width: 700px) {
+  .landing-home .notes-logo {
+    transform: translateY(-6vh);
+  }
 }
 
 .landing-home .landing-watermark {
@@ -3043,7 +3052,26 @@ body.notes-docked {
   --paper-shadow: rgba(17, 14, 10, 0.24);
   --paper-edge: rgba(29, 26, 22, 0.18);
   --paper-highlight: #fffaf1;
-  background: var(--paper-base);
+  --paper-line: rgba(78, 120, 150, 0.26);
+  --paper-margin: rgba(186, 78, 78, 0.45);
+  background-color: var(--paper-base);
+  background-image:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      transparent 10%,
+      var(--paper-margin) 10%,
+      var(--paper-margin) 10.6%,
+      transparent 10.6%,
+      transparent 100%
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 26px,
+      var(--paper-line) 27px
+    ),
+    linear-gradient(180deg, var(--paper-highlight), var(--paper-base));
   color: var(--paper-ink);
   min-height: 100vh;
   position: relative;
@@ -3076,15 +3104,23 @@ body.notes-docked {
   height: min(70vw, 480px);
   border-radius: 14px;
   border: 2px solid var(--paper-edge);
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(235, 226, 210, 0.7)),
-    repeating-linear-gradient(
+  background-image:
+    linear-gradient(
       90deg,
-      rgba(29, 26, 22, 0.05) 0px,
-      rgba(29, 26, 22, 0.05) 1px,
-      transparent 1px,
-      transparent 18px
-    );
+      transparent 0%,
+      transparent 12%,
+      rgba(186, 78, 78, 0.55) 12%,
+      rgba(186, 78, 78, 0.55) 12.8%,
+      transparent 12.8%,
+      transparent 100%
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 22px,
+      rgba(78, 120, 150, 0.35) 23px
+    ),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(235, 226, 210, 0.8));
   box-shadow:
     0 25px 50px rgba(29, 26, 22, 0.18),
     inset 0 0 0 1px rgba(255, 255, 255, 0.6);
@@ -3205,7 +3241,10 @@ body.notes-docked {
   height: 100%;
   transform-style: preserve-3d;
   transition: transform 0.76s cubic-bezier(0.22, 0.7, 0.2, 1);
-  transform: rotateX(var(--cube-rotate-x, 0deg)) rotateY(var(--cube-rotate-y, 0deg));
+  transform: rotateX(
+      calc(var(--cube-rotate-x, 0deg) + var(--cube-tilt-x, -20deg))
+    )
+    rotateY(calc(var(--cube-rotate-y, 0deg) + var(--cube-tilt-y, 28deg)));
 }
 
 .paper-cube-physics {
@@ -3232,49 +3271,49 @@ body.notes-docked {
 
 @keyframes cube-roll-up {
   0% {
-    transform: translateY(0) translateZ(0);
+    transform: translateY(0) translateZ(0) scale(1);
   }
   45% {
-    transform: translateY(-14px) translateZ(12px);
+    transform: translateY(-18px) translateZ(-40px) scale(0.96);
   }
   100% {
-    transform: translateY(0) translateZ(0);
+    transform: translateY(0) translateZ(0) scale(1);
   }
 }
 
 @keyframes cube-roll-down {
   0% {
-    transform: translateY(0) translateZ(0);
+    transform: translateY(0) translateZ(0) scale(1);
   }
   45% {
-    transform: translateY(14px) translateZ(12px);
+    transform: translateY(18px) translateZ(48px) scale(1.06);
   }
   100% {
-    transform: translateY(0) translateZ(0);
+    transform: translateY(0) translateZ(0) scale(1);
   }
 }
 
 @keyframes cube-roll-left {
   0% {
-    transform: translateX(0) translateZ(0);
+    transform: translateX(0) translateZ(0) scale(1);
   }
   45% {
-    transform: translateX(-14px) translateZ(12px);
+    transform: translateX(-18px) translateZ(10px) scale(1.02);
   }
   100% {
-    transform: translateX(0) translateZ(0);
+    transform: translateX(0) translateZ(0) scale(1);
   }
 }
 
 @keyframes cube-roll-right {
   0% {
-    transform: translateX(0) translateZ(0);
+    transform: translateX(0) translateZ(0) scale(1);
   }
   45% {
-    transform: translateX(14px) translateZ(12px);
+    transform: translateX(18px) translateZ(10px) scale(1.02);
   }
   100% {
-    transform: translateX(0) translateZ(0);
+    transform: translateX(0) translateZ(0) scale(1);
   }
 }
 
@@ -3343,14 +3382,39 @@ body.notes-docked {
   z-index: -1;
 }
 
+.paper-cube-roller[data-roll="up"] ~ .paper-cube-shadow {
+  transform: translateY(calc(var(--cube-size, 260px) * 0.55)) scale(0.88);
+  opacity: 0.55;
+}
+
+.paper-cube-roller[data-roll="down"] ~ .paper-cube-shadow {
+  transform: translateY(calc(var(--cube-size, 260px) * 0.6)) scale(1.1);
+  opacity: 0.8;
+}
+
 .paper-wrap {
   position: absolute;
   width: calc(var(--cube-size, 260px) * 1.15);
   height: calc(var(--cube-size, 260px) * 1.15);
   border-radius: 16px;
   border: 2px solid var(--paper-edge);
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.85), rgba(231, 222, 207, 0.65));
+  background-image:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      transparent 14%,
+      rgba(186, 78, 78, 0.45) 14%,
+      rgba(186, 78, 78, 0.45) 14.8%,
+      transparent 14.8%,
+      transparent 100%
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 20px,
+      rgba(78, 120, 150, 0.25) 21px
+    ),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(231, 222, 207, 0.7));
   box-shadow: 0 18px 36px rgba(29, 26, 22, 0.18);
   opacity: 1;
   transform: translateZ(10px);
