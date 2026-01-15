@@ -429,9 +429,12 @@ body.cube-fade-in .landing-home .landing-cube-icon {
 }
 
 .landing-home .notes-logo {
-  color: var(--neo-border);
-  opacity: 0.35;
-  text-shadow: none;
+  color: #ff4fd8;
+  opacity: 1;
+  text-shadow:
+    0 0 12px rgba(255, 79, 216, 0.7),
+    0 0 26px rgba(255, 79, 216, 0.55),
+    0 0 48px rgba(255, 79, 216, 0.35);
 }
 
 .landing-home .landing-watermark {
